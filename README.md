@@ -11,7 +11,7 @@ This repository contains my DS 4320 project on predicting NFL quarterback next-g
 | Name | Jolie Ng |
 | NetID | xhh6fb |
 | DOI | [![DOI - CHANGE!](https://zenodo.org/badge/DOI/10.5281/zenodo.19363443.svg)](https://doi.org/10.5281/zenodo.19363443) |
-| Press Release | [Press Release Title - CHANGE!](press_release.md) |
+| Press Release | [NFL Document Database Uses Pregame Trends to Project QB Performance](press_release.md) |
 | Pipeline | [Notebook - UPLOAD!](pipeline/project_2_pipeline.ipynb) & [Markdown - UPLOAD!](pipeline/project_2_pipeline.md)   |
 | License | [MIT](LICENSE) |
 
