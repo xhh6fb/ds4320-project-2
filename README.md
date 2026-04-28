@@ -1,4 +1,4 @@
-# DS 4320 Project 2: Projecting NFL Quarterback Passing Production
+# DS 4320 Project 2: Projecting NFL QB Passing Production
 
 ## Executive Summary
 
