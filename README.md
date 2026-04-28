@@ -10,7 +10,7 @@ This repository contains my DS 4320 Project 2 document-model data project on pre
 |---|---|
 | Name | Jolie Ng |
 | NetID | xhh6fb |
-| DOI | [![DOI - CHANGE!](https://doi.org/10.5281/zenodo.19363443) |
+| DOI | [DOI - CHANGE!](https://doi.org/10.5281/zenodo.19363443) |
 | Press Release | [Press Release Title - CHANGE!](press_release.md) |
 | Pipeline | [Notebook - UPLOAD!](pipeline/project_2_pipeline.ipynb) & [Markdown - UPLOAD!](pipeline/project_2_pipeline.md)   |
 | License | [MIT](LICENSE) |
