@@ -66,25 +66,17 @@ I refined the problem from broad athletic performance to quarterback next-game p
 
 This project lives in the domain of sports analytics, specifically NFL player performance modeling. Sports analytics uses historical game and player data to answer questions about prediction, evaluation, and strategy. Within that domain, quarterback performance is one of the most studied topics because passing production often drives offensive success. The project uses public NFL data to construct player-week documents that combine historical performance, recent form, opponent context, and scheduling context into a structure suitable for modeling. The goal is not just to describe what happened, but to use pregame information to estimate what is likely to happen next.
 
-### Background Reading - FIX!
+### Background Reading
 
 The [`background_reading`](background_reading) folder contains readings that help explain the football analytics context of this project.
 
-| Title | Brief description | File |
-|---|---|---|
-| nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Introduces a reproducible framework for evaluating NFL offensive players using public play-by-play data, expected points, and win probability models to estimate Wins Above Replacement (WAR). | `background_readings/01_nflwar.pdf` |
-| A Reinforcement Learning Based Approach to Play Calling in Football | Formulates play calling as a sequential decision-making problem and applies reinforcement learning / expected utility optimization to identify optimal play-calling strategies based on game state. | `background_readings/02_reinforcement_learning_approach_to_play_calling.pdf` |
-| NFL Play Prediction | Uses machine learning to predict the outcome of NFL plays (e.g. yardage or play result) and explores how predictive models could be used to inform or optimize in-game play selection. | `background_readings/03_nfl_play_prediction.pdf` |
-| The Quarterback Prediction Problem: Forecasting NFL QB Performance | Demonstrates the difficulty of predicting NFL quarterback performance using pre-draft college and combine data, showing limited predictive power of traditional pre-draft metrics. | `background_readings/04_quarterback_prediction_problem.pdf` |
-| next-gen-scraPy: Extracting NFL Tracking Data from Images to Evaluate Quarterbacks and Pass Defenses | Develops a method to extract spatial passing data from NFL Next Gen Stats visualizations and uses it to evaluate quarterback accuracy and defensive performance using spatial completion models. | `background_readings/05_next_gen_scrapy.pdf` |
-
 | Index | Title | Brief Description | Path |
 |---|---|---|---|
-| 1 | Predicting the Outcome of NFL Games Using Logistic Regression | Honors thesis focused directly on NFL game outcome prediction and logistic-regression model framing | [Link](background_reading/01_predicting_outcome_of_nfl_games_using_logistic_regression.pdf) |
-| 2 | Modeling NFL Football Outcomes | Paper discussing statistical models for NFL outcome prediction | [Link](background_reading/02_modeling_nfl_football_outcomes.pdf) |
-| 3 | The Effect of Attendance on Home Field Advantage in the NFL | Study of home-field effects and how attendance relates to them | [Link](background_reading/03_nfl_home_field_advantage.pdf) |
-| 4 | Is the NFL Betting Market Efficient? | Economics paper on whether NFL betting prices are efficient | [Link](background_reading/04_nfl_betting_market_efficiency.pdf) |
-| 5 | Assessing the Convergence of the Elo Ranking Model | Paper on Elo-model convergence and ranking stability | [Link](background_reading/05_assessing_the_convergence_of_the_elo_ranking_model.pdf) |
+| 1 | nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Reproducible NFL offensive player evaluation using WAR models | [Link](background_reading/01_nflwar.pdf) |
+| 2 | A Reinforcement Learning Based Approach to Play Calling in Football | Uses reinforcement learning to optimize football play calling decisions | [Link](background_reading/02_reinforcement_learning_approach_to_play_calling.pdf) |
+| 3 | NFL Play Prediction | Machine learning models predict NFL play outcomes and yardage | [Link](background_reading/03_nfl_play_prediction.pdf) |
+| 4 | The Quarterback Prediction Problem: Forecasting NFL QB Performance | Shows difficulty predicting QB performance from pre-draft data | [Link](background_reading/04_quarterback_prediction_problem.pdf) |
+| 5 | next-gen-scraPy: Extracting NFL Tracking Data from Images to Evaluate Quarterbacks and Pass Defenses | Extracts tracking data to evaluate quarterbacks and pass defenses | [Link](background_reading/05_next_gen_scrapy.pdf) |
 
 <br>
 
