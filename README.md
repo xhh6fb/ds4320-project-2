@@ -1,4 +1,4 @@
-# DS 4320 Project 2: Pregame NFL Quarterback Performance Projection
+# DS 4320 Project 2: NFL Quarterback Performance Projection
 
 ## Executive Summary
 
