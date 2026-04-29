@@ -1,16 +1,28 @@
 import pandas as pd
 import logging
 
-
+# ================================
+# LOGGER SETUP
+# ================================
 def setup_logger(log_file_name):
+    """
+    Creates a logger that writes pipeline logs to a file.
+    Useful for debugging ETL + feature pipeline issues.
+    """
+
     logger = logging.getLogger(log_file_name)
 
+    # prevent duplicate logs if re-run in notebook
     if not logger.handlers:
         logger.setLevel(logging.INFO)
-        fh = logging.FileHandler(log_file_name)
-        fmt = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        fh.setFormatter(fmt)
-        logger.addHandler(fh)
+
+        file_handler = logging.FileHandler(log_file_name)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s"
+        )
+        file_handler.setFormatter(formatter)
+
+        logger.addHandler(file_handler)
 
     return logger
 
@@ -26,24 +38,38 @@ def add_rest_days(df, logger):
     return df
 
 
-# -----------------------------
-# CORE ROLLING FEATURES
-# -----------------------------
+# ================================
+# ROLLING QB FORM FEATURES
+# ================================
 def add_rolling_features(df, logger):
-    logger.info("Rolling features (3-game)")
+    """
+    Creates short-term QB performance features.
+    IMPORTANT: uses shift() to prevent data leakage.
+    """
 
-    df = df.sort_values(["player_id", "season", "week"])
+    logger.info("Adding rolling QB features (3-game window)")
 
+    df = df.sort_values(["player_id", "game_date"])
+
+    # last 3 games passing yards
     df["yards_last3"] = (
         df.groupby("player_id")["passing_yards"]
         .transform(lambda x: x.shift().rolling(3).mean())
     )
 
+    # last 5 games passing yards
+    df["yards_last5"] = (
+        df.groupby("player_id")["passing_yards"]
+        .transform(lambda x: x.shift().rolling(5).mean())
+    )
+
+    # last 3 games TDs
     df["tds_last3"] = (
         df.groupby("player_id")["passing_tds"]
         .transform(lambda x: x.shift().rolling(3).mean())
     )
 
+    # last 3 games attempts
     df["atts_last3"] = (
         df.groupby("player_id")["attempts"]
         .transform(lambda x: x.shift().rolling(3).mean())
@@ -52,49 +78,75 @@ def add_rolling_features(df, logger):
     return df
 
 
-# -----------------------------
-# EXTRA FEATURES FOR YOUR MODEL
-# -----------------------------
+# ================================
+# EXTENDED EFFICIENCY FEATURES
+# ================================
 def add_extended_rolling_features(df, logger):
-    logger.info("Extended rolling features")
+    """
+    Adds derived efficiency metrics.
+    """
 
-    df["yards_last5"] = (
-        df.groupby("player_id")["passing_yards"]
-        .transform(lambda x: x.shift().rolling(5).mean())
-    )
+    logger.info("Adding extended QB efficiency features")
 
+    # efficiency per attempt
     df["yards_per_attempt"] = df["passing_yards"] / df["attempts"]
 
     return df
 
 
-# -----------------------------
-# DEFENSE FEATURES
-# -----------------------------
-def add_defense_features(pbp, logger):
-    logger.info("Defense features")
+# ================================
+# DEFENSE STRENGTH FEATURES
+# ================================
+def add_defense_features(pbp, qb, logger):
+    """
+    Builds opponent defensive strength metrics
+    and merges them into QB dataset.
+    """
 
-    defense = pbp.groupby(["season", "week", "defteam"]).agg(
+    logger.info("Building defensive strength features")
+
+    # ================================
+    # AGGREGATE DEFENSE PERFORMANCE
+    # ================================
+    defense = pbp.groupby(
+        ["season", "week", "defteam"]
+    ).agg(
         def_pass_yards=("passing_yards", "sum"),
         def_pass_tds=("pass_touchdown", "sum"),
-        def_pass_att=("pass_attempt", "sum")
+        def_pass_attempts=("pass_attempt", "sum")
     ).reset_index()
 
-    defense = defense.sort_values(["defteam", "season", "week"])
+    # rename for merging
+    defense.rename(columns={"defteam": "opponent"}, inplace=True)
 
+    # ================================
+    # SORT FOR TIME SERIES LOGIC
+    # ================================
+    defense = defense.sort_values(["opponent", "season", "week"])
+
+    # ================================
+    # ROLLING DEFENSE STRENGTH (5-week window)
+    # ================================
     defense["def_yards_pg"] = (
-        defense.groupby("defteam")["def_pass_yards"]
+        defense.groupby("opponent")["def_pass_yards"]
         .transform(lambda x: x.shift().rolling(5).mean())
     )
 
     defense["def_tds_pg"] = (
-        defense.groupby("defteam")["def_pass_tds"]
+        defense.groupby("opponent")["def_pass_tds"]
         .transform(lambda x: x.shift().rolling(5).mean())
     )
 
-    defense.rename(columns={"defteam": "team"}, inplace=True)
+    # ================================
+    # MERGE INTO QB DATASET
+    # ================================
+    qb = qb.merge(
+        defense,
+        on=["season", "week", "opponent"],
+        how="left"
+    )
 
-    return defense
+    return qb
 
 
 # -----------------------------
@@ -135,3 +187,4 @@ def row_to_doc(row):
             "passing_tds": row["passing_tds"]
         }
     }
+
