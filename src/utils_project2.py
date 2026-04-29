@@ -83,37 +83,65 @@ def add_rolling_features(df, logger):
 
     return df
 
+# -----------------------------------------
+# ADD DEFENSE FEATURES
+# -----------------------------------------
+def add_defense_features(pbp, logger):
+    logger.info("Building defensive features")
+
+    defense = pbp.groupby(
+        ["season", "week", "defteam"]
+    ).agg({
+        "passing_yards": "sum",
+        "pass_touchdown": "sum",
+        "pass_attempt": "sum"
+    }).reset_index()
+
+    defense.columns = [
+        "season", "week", "team",
+        "def_pass_yards",
+        "def_pass_tds",
+        "def_pass_atts"
+    ]
+
+    defense = defense.sort_values(["team", "season", "week"])
+
+    defense["def_yards_pg"] = defense.groupby("team")["def_pass_yards"].transform(lambda x: x.shift().rolling(5).mean())
+    defense["def_tds_pg"] = defense.groupby("team")["def_pass_tds"].transform(lambda x: x.shift().rolling(5).mean())
+
+    return defense
 
 # -----------------------------------------
 # CONVERT ROW → MONGODB DOCUMENT
 # -----------------------------------------
-def row_to_document(row):
-
+def row_to_doc(row):
     return {
         "_id": f"{row['season']}_{row['week']}_{row['player_id']}",
-
         "season": int(row["season"]),
         "week": int(row["week"]),
-        "game_date": str(row["game_date"]),
-        "game_type": "REG",
 
         "player_info": {
             "player_id": row["player_id"],
             "player_name": row["player_name"],
-            "position": "QB",
             "team": row["team"]
         },
 
         "game_context": {
-            "team": row["team"],
             "opponent": row["opponent"],
-            "is_home": bool(row["is_home"]),
-            "days_rest": row["days_rest"]
+            "is_home": True
         },
 
         "pregame_form": {
-            "avg_pass_yards_last_3": row["avg_pass_yards_last_3"],
-            "avg_pass_tds_last_3": row["avg_pass_tds_last_3"]
+            "yards_last3": row["yards_last3"],
+            "yards_last5": row["yards_last5"],
+            "tds_last3": row["tds_last3"],
+            "atts_last3": row["atts_last3"],
+            "yards_per_attempt": row["yards_per_attempt"]
+        },
+
+        "opponent_context": {
+            "opp_pass_yards_pg": row["def_yards_pg"],
+            "opp_pass_tds_pg": row["def_tds_pg"]
         },
 
         "targets": {
