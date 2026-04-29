@@ -57,12 +57,6 @@ def add_rolling_features(df, logger):
         .transform(lambda x: x.shift().rolling(3).mean())
     )
 
-    # last 5 games passing yards
-    df["yards_last5"] = (
-        df.groupby("player_id")["passing_yards"]
-        .transform(lambda x: x.shift().rolling(5).mean())
-    )
-
     # last 3 games TDs
     df["tds_last3"] = (
         df.groupby("player_id")["passing_tds"]
@@ -113,11 +107,7 @@ def add_defense_features(pbp, qb, logger):
     ).agg(
         def_pass_yards=("passing_yards", "sum"),
         def_pass_tds=("pass_touchdown", "sum"),
-        def_pass_attempts=("pass_attempt", "sum")
     ).reset_index()
-
-    # rename for merging
-    defense.rename(columns={"defteam": "opponent"}, inplace=True)
 
     # ================================
     # SORT FOR TIME SERIES LOGIC
@@ -137,6 +127,9 @@ def add_defense_features(pbp, qb, logger):
         .transform(lambda x: x.shift().rolling(5).mean())
     )
 
+    # rename for merging
+    defense.rename(columns={"defteam": "opponent"}, inplace=True)
+
     # ================================
     # MERGE INTO QB DATASET
     # ================================
@@ -147,44 +140,3 @@ def add_defense_features(pbp, qb, logger):
     )
 
     return qb
-
-
-# -----------------------------
-# MONGO DOCUMENT FORMAT
-# -----------------------------
-def row_to_doc(row):
-    return {
-        "_id": f"{row['season']}_{row['week']}_{row['player_id']}",
-
-        "season": int(row["season"]),
-        "week": int(row["week"]),
-
-        "player_info": {
-            "player_id": row["player_id"],
-            "player_name": row["player_name"],
-            "team": row["team"]
-        },
-
-        "game_context": {
-            "opponent": row["opponent"]
-        },
-
-        "pregame_form": {
-            "yards_last3": row["yards_last3"],
-            "yards_last5": row["yards_last5"],
-            "tds_last3": row["tds_last3"],
-            "atts_last3": row["atts_last3"],
-            "yards_per_attempt": row["yards_per_attempt"]
-        },
-
-        "opponent_context": {
-            "opp_def_yards_pg": row["def_yards_pg"],
-            "opp_def_tds_pg": row["def_tds_pg"]
-        },
-
-        "targets": {
-            "passing_yards": row["passing_yards"],
-            "passing_tds": row["passing_tds"]
-        }
-    }
-
