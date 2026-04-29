@@ -45,22 +45,22 @@ I refined the problem from broad athletic performance to quarterback next-game p
 
 | Term | Meaning | Why It Matters |
 |---|---|---|
-| NFL | National Football League | Add text |
-| QB | Quarterback | Add text |
-| Passing yards | Total yards gained through completed forward passes | Add text |
-| Passing touchdowns | Number of touchdown passes thrown | Add text |
-| Interceptions | Passes thrown to the defense | Add text |
-| Completion percentage | Completions divided by pass attempts | Add text |
-| Attempt volume | Number of passes thrown in a game | Add text |
-| Pregame feature | A variable known before kickoff | Add text |
-| Rolling average | An average calculated from prior games only | Add text |
-| Opponent defense | The defense the quarterback will face in the upcoming game | Add text |
-| Home/away split | Whether the game is played at the QB’s home stadium or away | Add text |
-| Rest days | Number of days since the player’s previous game | Add text |
-| Document model | A database model that stores data as nested documents, such as JSON-like objects | Add text |
-| MongoDB | A document-oriented database system | Add text |
-| nflverse | An open NFL analytics data ecosystem | Add text |
-| nflreadpy | The Python package used to access nflverse data in Python | Add text |
+| NFL | National Football League | The NFL is the data-generating environment for the entire project. All observations, features, and predictions are based on NFL game and player data. |
+| QB | Quarterback | Quarterbacks are the focus of the project because they have consistent passing statistics each game, making them suitable for predictive modeling. |
+| Passing yards | Total yards gained through completed forward passes | This is one of the main target variables the model is trying to predict for the next game. |
+| Passing touchdowns | Number of touchdown passes thrown | This is the second main target variable for prediction and represents scoring contribution through passing. |
+| Interceptions | Passes thrown to the defense | Interceptions help describe quarterback risk and decision-making, and can be used as part of pregame form features. |
+| Completion percentage | Completions divided by pass attempts | This is an efficiency metric that reflects passing accuracy and is used in engineered pregame features. |
+| Attempt volume | Number of passes thrown in a game | Attempt volume is important because more pass attempts generally lead to more yards and touchdowns, making it a key predictive feature. |
+| Pregame feature | A variable known before kickoff | All input features in the model must be pregame features to avoid data leakage and ensure realistic prediction. |
+| Rolling average | An average calculated from prior games only | Rolling averages summarize recent performance trends and help reduce noise from single-game variability. |
+| Opponent defense | The defense the quarterback will face in the upcoming game | Opponent defensive strength affects expected passing production, so it is included as contextual input features. |
+| Home/away split | Whether the game is played at the QB’s home stadium or away | Game location can influence performance due to travel, crowd noise, and familiarity, making it a useful feature. |
+| Rest days | Number of days since the player’s previous game | Rest can affect player performance and recovery, so it is included as a scheduling-based feature. |
+| Document model | A database model that stores data as nested documents, such as JSON-like objects | The project uses a document model so each quarterback-game observation can store rich nested context (player, game, opponent, trends) in one structure. |
+| MongoDB | A document-oriented database system | MongoDB is used to store and query the custom quarterback-game dataset built for this project. |
+| nflverse | An open NFL analytics data ecosystem | nflverse provides the raw public data used to construct the custom dataset. |
+| nflreadpy | The Python package used to access nflverse data in Python | nflreadpy is the tool used to load the raw NFL datasets into Python for cleaning, feature engineering, and document creation. |
 
 ### Domain
 
@@ -90,6 +90,15 @@ The raw acquisition process begins by downloading the relevant nflverse tables i
 
 ### Data Creation Code - FIX!
 
+| File | What it does | Link/path |
+|---|---|---|
+| `src/build_project2_documents.py` | Loads raw nflverse data through `nflreadpy`, filters and cleans quarterback observations, computes rolling pregame features, creates opponent context, and writes the final custom dataset as flat CSV and MongoDB-ready JSON documents | `src/build_project2_documents.py` |
+| `src/load_project2_to_mongo.py` | Connects to MongoDB Atlas and inserts the prepared quarterback documents into the target collection | `src/load_project2_to_mongo.py` |
+| `src/utils_project2.py` | Provides helper functions for logging, defensive column handling, rolling feature creation, document serialization, and dataframe flattening | `src/utils_project2.py` |
+| `src/sample_mongosh_queries.js` | Contains example `mongosh` commands for checking, querying, and summarizing the MongoDB collection | `src/sample_mongosh_queries.js` |
+| `pipeline/project2_pipeline.ipynb` | Queries MongoDB into a dataframe, performs the modeling pipeline, evaluates prediction performance, and creates visualizations | `pipeline/project2_pipeline.ipynb` |
+| `pipeline/project2_pipeline.md` | Markdown export of the notebook pipeline | `pipeline/project2_pipeline.md` |
+
 The code below shows the python file used to create the secondary dataset and support the project pipeline.
 
 | File | Description |
@@ -99,10 +108,6 @@ The code below shows the python file used to create the secondary dataset and su
 | `project2_pipeline.ipynb` | Queries MongoDB into dataframes, performs the analysis/modeling pipeline, and creates visualizations |
 | `project2_pipeline.md` | Markdown export of the notebook pipeline |
 | `utils_project2.py` | Helper functions for logging, validation, rolling feature creation, and safe transformations |
-
-| File | What It Does | Path |
-|---|---|---|
-| `pipeline/build_project_tables.py` | Loads raw data from `nflreadpy`, filters to completed regular-season games, creates the `teams`, `games`, `team_games`, and `matchups` tables, loads them into DuckDB, and exports the final tables as parquet files | [Link](pipeline/build_project_tables.py) |
 
 ### Bias Identification
 
@@ -124,56 +129,108 @@ There are also judgment calls around which games to include. Restricting the dat
 
 ### Implicit Schema - FIX!
 
-Since this is a document-model project, the logical schema is a soft schema** instead of a fully normalized relational schema. The core collection will be a quarterback-game collection in MongoDB.
+The MongoDB collection stores one document per quarterback-game observation. Each document is designed to represent the quarterback’s pregame situation for a specific game, while also storing the actual game outcomes used later for evaluation. The schema is “soft” rather than rigid because MongoDB is document-oriented, but the project follows a consistent structure across documents.
 
-**quarterbacks_games (collection structure)**
+#### Top-level document structure
 
-| Field |
-|---|
-| _id |
-| game_id |
-| season |
-| week |
-| gameday |
-| player_info { ... } |
-| team_context { ... } |
-| opponent_context { ... } |
-| pregame_form { ... } |
-| outcome { ... } |
+- `_id`: custom unique identifier for the quarterback-game document
+- `game_id`: source game identifier when available
+- `season`: NFL season year
+- `week`: NFL regular-season week
+- `game_date`: date of the game
+- `game_type`: game type, restricted in this project to regular season
 
-**Logical structure of one document**
+#### Nested object: `player_info`
 
-#### player_info
-- player_id  
-- player_name  
-- team  
-- position  
+Stores quarterback identity fields.
 
-#### team_context
-- is_home  
-- days_rest  
-- team_record_before  
-- team_points_for_pg_before  
-- team_points_against_pg_before  
+- `player_id`: player identifier
+- `player_name`: quarterback name
+- `position`: player position, expected to be `QB`
+- `team`: quarterback team abbreviation for that game
 
-#### opponent_context
-- opponent_team  
-- opponent_record_before  
-- opponent_points_allowed_pg_before  
+#### Nested object: `game_context`
 
-#### pregame_form
-- games_played_before  
-- pass_attempts_pg_before  
-- completions_pg_before  
-- completion_pct_before  
-- pass_yards_pg_before  
-- pass_tds_pg_before  
-- interceptions_pg_before  
+Stores game-level context known before kickoff.
 
-#### outcome
-- actual_pass_yards  
-- actual_pass_tds  
-- actual_interceptions  
+- `team`: quarterback team
+- `opponent`: opposing team
+- `is_home`: whether the quarterback’s team is playing at home
+- `days_rest`: days since the quarterback’s previous game
+
+#### Nested object: `pregame_form`
+
+Stores engineered pregame quarterback trend and usage features based only on prior games.
+
+- `games_played_before`
+- `avg_pass_yards_last_3`
+- `avg_pass_yards_last_5`
+- `avg_pass_tds_last_3`
+- `avg_pass_tds_last_5`
+- `avg_attempts_last_3`
+- `avg_attempts_last_5`
+- `avg_completions_last_3`
+- `avg_completions_last_5`
+- `avg_ints_last_3`
+- `season_to_date_pass_yards_pg`
+- `season_to_date_pass_tds_pg`
+- `season_to_date_attempts_pg`
+- `season_to_date_comp_pct`
+- `season_to_date_yards_per_attempt`
+
+#### Nested object: `opponent_context`
+
+Stores opponent pass-defense context known before kickoff.
+
+- `opp_pass_yards_allowed_pg`
+- `opp_pass_tds_allowed_pg`
+- `opp_attempts_faced_pg`
+- `opp_completions_allowed_pg`
+
+#### Nested object: `targets`
+
+Stores the actual postgame outcomes that the model tries to predict.
+
+- `passing_yards`
+- `passing_tds`
+
+#### Example conceptual document
+
+```json
+{
+  "_id": "2024_03_BUF_JAX_00-0034857",
+  "season": 2024,
+  "week": 3,
+  "game_date": "2024-09-23",
+  "game_type": "REG",
+  "player_info": {
+    "player_id": "00-0034857",
+    "player_name": "Josh Allen",
+    "position": "QB",
+    "team": "BUF"
+  },
+  "game_context": {
+    "team": "BUF",
+    "opponent": "JAX",
+    "is_home": false,
+    "days_rest": 7
+  },
+  "pregame_form": {
+    "games_played_before": 2,
+    "avg_pass_yards_last_3": 254.5,
+    "avg_pass_tds_last_3": 2.0,
+    "season_to_date_pass_yards_pg": 254.5
+  },
+  "opponent_context": {
+    "opp_pass_yards_allowed_pg": 226.0,
+    "opp_pass_tds_allowed_pg": 1.5
+  },
+  "targets": {
+    "passing_yards": 263,
+    "passing_tds": 2
+  }
+}
+```
 
 ### Data Summary - FIX!
 
