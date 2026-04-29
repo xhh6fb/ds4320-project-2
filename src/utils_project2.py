@@ -4,6 +4,7 @@ import logging
 # ============================================================
 # LOGGER SETUP
 # ============================================================
+
 def setup_logger(log_file_name):
     """
     Creates a logger that writes pipeline logs to a file.
@@ -29,9 +30,13 @@ def setup_logger(log_file_name):
 # ============================================================
 # REST DAYS (PREVIOUS GAME ONLY SO NO LEAKAGE)
 # ============================================================
+
 def add_rest_days(df, logger):
 
     logger.info("Adding rest days feature")
+
+    # ensure datetime
+    df["game_date"] = pd.to_datetime(df["game_date"], errors="coerce")
 
     df = df.sort_values(["player_id", "game_date"])
 
@@ -44,6 +49,7 @@ def add_rest_days(df, logger):
 # ============================================================
 # WEATHER CLEANING
 # ============================================================
+
 def add_weather_features(df, logger):
 
     logger.info("Processing weather features")
@@ -59,6 +65,7 @@ def add_weather_features(df, logger):
 # ============================================================
 # HOME OR AWAY
 # ============================================================
+
 def add_home_away(df, logger):
 
     logger.info("Adding home/away feature")
@@ -70,6 +77,7 @@ def add_home_away(df, logger):
 # ============================================================
 # QB LAST 5 GAMES AVERAGE YARDS (QB "SKILL")
 # ============================================================
+
 def add_qb_form(df, logger):
 
     logger.info("Adding QB last 5 games form")
@@ -86,6 +94,7 @@ def add_qb_form(df, logger):
 # ============================================================
 # DEFENSE LAST 5 GAMES AVERAGE YARDS (DEFENSE "SKILL")
 # ============================================================
+
 def add_defense_features(df, logger):
 
     logger.info("Adding defensive strength features")
