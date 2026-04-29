@@ -282,21 +282,19 @@ Stores actual postgame outcomes used for model evaluation.
 ### Quantification of Uncertainty for Numerical Features
  
 The table below summarizes the observed distribution of the main numerical features in the final dataset, computed from the full pipeline output. Features marked as excluded were present in the data but withheld from the prediction model.
- 
+
 | Feature | Role | Mean | Std Dev | Min | 25th Pct | Median | 75th Pct | Max | Missing % |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| `passing_yards` | Target | ~262 | ~72 | 1 | ~210 | ~265 | ~315 | 501 | 0% |
-| `days_rest` | Predictor | ~8.5 | ~18 | 4 | 6 | 7 | 8 | 364 | ~1% |
-| `spread_line` | Predictor | ~1.2 | ~6.5 | -14.5 | -3.5 | 1.5 | 6.5 | 14.0 | ~1% |
-| `total_line` | Predictor | ~46.5 | ~4.5 | 33.5 | 43.5 | 46.5 | 49.5 | 56.0 | ~1% |
-| `qb_pass_share` | Predictor | ~0.97 | ~0.08 | 0.06 | 1.0 | 1.0 | 1.0 | 1.0 | ~1% |
-| `opp_epa_per_pass_allowed` | Predictor | ~0.06 | ~0.15 | -0.45 | -0.04 | 0.06 | 0.15 | 0.63 | ~5% |
-| `opp_success_rate_allowed` | Predictor | ~0.46 | ~0.05 | 0.32 | 0.43 | 0.46 | 0.50 | 0.62 | ~5% |
-| `opp_air_yards_allowed` | Predictor | ~7.8 | ~0.9 | 5.5 | 7.1 | 7.8 | 8.6 | 11.0 | ~5% |
-| `opp_yac_allowed` | Predictor | ~5.0 | ~0.6 | 3.5 | 4.6 | 5.0 | 5.4 | 7.5 | ~5% |
-| `bad_weather` | Predictor | ~0.11 | ~0.31 | 0 | 0 | 0 | 0 | 1 | 0% |
-| `is_home` | Predictor | ~0.50 | ~0.50 | 0 | 0 | 0.5 | 1 | 1 | 0% |
-| `yards_last5` | Excluded | ~267 | ~65 | 15 | ~230 | ~270 | ~310 | ~400 | ~8% |
-| `yards_last5_std` | Excluded | ~60 | ~30 | 2 | ~40 | ~57 | ~80 | ~214 | ~8% |
- 
-Note: approximately 5–8% missingness on opponent defensive features and rolling form features reflects early-season games where fewer than five prior opponent games are available for the rolling window calculation. `min_periods=1` is applied so these rows are retained with partial-window averages rather than dropped.
+|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `passing_yards` | Target | 210.377 | 94.385 | -4.000 | 157.000 | 217.000 | 274.000 | 525.000 | 0.0% |
+| `days_rest` | Predictor | 29.274 | 83.111 | 4.000 | 7.000 | 7.000 | 10.000 | 1071.000 | 0.0% |
+| `spread_line` | Predictor | 1.862 | 6.385 | -17.000 | -3.000 | 3.000 | 6.500 | 20.000 | 0.0% |
+| `total_line` | Predictor | 44.715 | 4.556 | 28.500 | 42.000 | 44.500 | 47.500 | 58.000 | 0.0% |
+| `qb_pass_share` | Predictor | 0.885 | 0.266 | 0.019 | 0.971 | 1.000 | 1.000 | 1.000 | 0.0% |
+| `opp_epa_per_pass_allowed` | Predictor | 0.025 | 0.161 | -0.477 | -0.080 | 0.024 | 0.133 | 0.626 | 0.0% |
+| `opp_success_rate_allowed` | Predictor | 0.451 | 0.052 | 0.273 | 0.417 | 0.451 | 0.485 | 0.617 | 0.0% |
+| `opp_air_yards_allowed` | Predictor | 7.765 | 1.057 | 4.650 | 7.034 | 7.705 | 8.455 | 11.710 | 0.0% |
+| `opp_yac_allowed` | Predictor | 5.223 | 0.782 | 2.813 | 4.696 | 5.185 | 5.685 | 8.657 | 0.0% |
+| `bad_weather` | Predictor | 0.145 | 0.352 | 0.000 | 0.000 | 0.000 | 0.000 | 1.000 | 0.0% |
+| `is_home` | Predictor | 0.509 | 0.500 | 0.000 | 0.000 | 1.000 | 1.000 | 1.000 | 0.0% |
+| `yards_last5` | Excluded | 213.280 | 69.276 | 1.000 | 179.950 | 225.800 | 259.525 | 383.200 | 0.0% |
+| `yards_last5_std` | Excluded | 71.385 | 31.466 | 0.707 | 48.752 | 68.446 | 90.759 | 212.132 | 0.0% |
