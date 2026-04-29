@@ -4,28 +4,42 @@ import os
 
 from utils_project2 import *
 
-logger = setup_logger("build_data.log")
+logger = setup_logger("build.log")
 
-logger.info("STARTING DATA BUILD")
+logger.info("STARTING NFL CONTEXT MODEL PIPELINE")
 
 try:
-    # -----------------------------------------
-    # LOAD DATA
-    # -----------------------------------------
+    # ============================================================
+    # LOAD FULL PLAY-BY-PLAY DATA
+    # ============================================================
     pbp = nfl.import_pbp_data([2020, 2021, 2022, 2023, 2024])
 
-    # keep passing plays
-    pbp = pbp[pbp["pass_attempt"] == 1]
+    # logging
+    logger.info(f"Loaded pbp shape: {pbp.shape}")
 
-    # -----------------------------------------
-    # QB GAME LEVEL AGGREGATION
-    # -----------------------------------------
+    # ============================================================
+    # QB GAME-LEVEL TARGET DATASET
+    # AGGREGATING TARGET VARIABLES
+    # ============================================================
     qb = pbp.groupby(
-        ["season", "week", "passer_id", "passer_player_name", "posteam", "defteam"]
+        [
+            "season",
+            "week",
+            "game_id",
+            "passer_id",
+            "passer_player_name",
+            "posteam",
+            "defteam",
+            "home_team",
+            "away_team",
+            "game_date",
+            "temp",
+            "wind",
+            "time_of_day"
+        ]
     ).agg(
         passing_yards=("passing_yards", "sum"),
-        passing_tds=("pass_touchdown", "sum"),
-        attempts=("pass_attempt", "sum")
+        pass_attempts=("pass_attempt", "sum")
     ).reset_index()
 
     qb.rename(columns={
@@ -35,36 +49,46 @@ try:
         "defteam": "opponent"
     }, inplace=True)
 
-    # -----------------------------------------
-    # FILTER LOW SAMPLE GAMES
-    # -----------------------------------------
-    qb = qb[qb["attempts"] >= 5]
+    # ============================================================
+    # FEATURE ENGINEERING (NO QB YARD LEAKAGE)
+    # ============================================================
 
-    logger.info(f"After aggregation and filtering: {len(qb)} rows")
+    # QB form (ONLY past info via shift inside function)
+    qb = add_qb_form(qb, logger)
 
-    # -----------------------------------------
-    # APPLY FEATURE ENGINEERING PIPELINE
-    # -----------------------------------------
-    qb = add_rolling_features(qb, logger)
-    qb = add_extended_rolling_features(qb, logger)
-    qb = add_defense_features(pbp, qb, logger)
+    # rest days
+    qb = add_rest_days(qb, logger)
 
-    qb = add_relative_features(qb, logger)
-    qb = add_interaction_features(qb, logger)
+    # weather cleanup + binary flag
+    qb = add_weather_features(qb, logger)
 
+    # home/away
+    qb = add_home_away(qb, logger)
+
+    # ============================================================
+    # DEFENSE FEATURES
+    # ============================================================
+    defense = add_defense_features(pbp, logger)
+
+    qb = qb.merge(
+        defense,
+        on=["season", "week", "opponent"],
+        how="left"
+    )
+
+    # ============================================================
+    # CLEAN FINAL DATASET
+    # ============================================================
     qb = qb.dropna()
 
-    logger.info(f"Final dataset size: {len(qb)}")
-
-    # -----------------------------------------
-    # SAVE FINAL CSV (FOR NOTEBOOK + MONGO + GITHUB)
-    # -----------------------------------------
+    # ============================================================
+    # SAVE AS CSV
+    # ============================================================
     os.makedirs("data", exist_ok=True)
+    qb.to_csv("data/qb_games.csv", index=False)
 
-    output_path = "data/qb_games.csv"
-    qb.to_csv(output_path, index=False)
-
-    logger.info(f"Saved dataset to {output_path}")
+    logger.info(f"Final dataset shape: {qb.shape}")
+    logger.info("PIPELINE COMPLETE")
 
 except Exception as e:
     logger.error("PIPELINE FAILED")
