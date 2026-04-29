@@ -1,9 +1,7 @@
 pandas
 numpy
-matplotlib
 scikit-learn
 pymongo
-python-dotenv
-jupyter
 nflreadpy
-polars
+matplotlib
+jupyter
