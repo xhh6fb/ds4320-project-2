@@ -10,16 +10,14 @@ logger.info("STARTING NFL CONTEXT MODEL PIPELINE")
 
 try:
     # ============================================================
-    # LOAD FULL PLAY-BY-PLAY DATA
+    # LOAD DATA
     # ============================================================
     pbp = nfl.import_pbp_data([2020, 2021, 2022, 2023, 2024])
 
-    # logging
     logger.info(f"Loaded pbp shape: {pbp.shape}")
 
     # ============================================================
-    # QB GAME-LEVEL TARGET DATASET
-    # AGGREGATING TARGET VARIABLES
+    # QB GAME LEVEL DATA
     # ============================================================
     qb = pbp.groupby(
         [
@@ -42,6 +40,9 @@ try:
         pass_attempts=("pass_attempt", "sum")
     ).reset_index()
 
+    # ============================================================
+    # STANDARDIZE COLUMN NAMES
+    # ============================================================
     qb.rename(columns={
         "passer_id": "player_id",
         "passer_player_name": "player_name",
@@ -50,23 +51,15 @@ try:
     }, inplace=True)
 
     # ============================================================
-    # FEATURE ENGINEERING (NO QB YARD LEAKAGE)
+    # FEATURE PIPELINE
     # ============================================================
-
-    # QB form (ONLY past info via shift inside function)
     qb = add_qb_form(qb, logger)
-
-    # rest days
     qb = add_rest_days(qb, logger)
-
-    # weather cleanup + binary flag
     qb = add_weather_features(qb, logger)
-
-    # home/away
     qb = add_home_away(qb, logger)
 
     # ============================================================
-    # DEFENSE FEATURES
+    # DEFENSE FEATURES AND MERGE
     # ============================================================
     defense = add_defense_features(pbp, logger)
 
@@ -88,7 +81,7 @@ try:
     qb.to_csv("data/qb_games.csv", index=False)
 
     logger.info(f"Final dataset shape: {qb.shape}")
-    logger.info("PIPELINE COMPLETE")
+    logger.info("PIPELINE COMPLETE SUCCESSFULLY")
 
 except Exception as e:
     logger.error("PIPELINE FAILED")
