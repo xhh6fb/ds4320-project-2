@@ -49,6 +49,9 @@ try:
     qb = add_extended_rolling_features(qb, logger)
     qb = add_defense_features(pbp, qb, logger)
 
+    qb = add_relative_features(qb, logger)
+    qb = add_interaction_features(qb, logger)
+
     qb = qb.dropna()
 
     logger.info(f"Final dataset size: {len(qb)}")
