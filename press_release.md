@@ -32,7 +32,7 @@ All three models beat the baseline. XGBoost was the best performer, reducing mea
 | Random Forest | 62.96 | 0.190 |
 | XGBoost | **62.51** | **0.223** |
 
-The improvement is real but modest. The three non-baseline models all landed within half a yard of each other on MAE, which suggests the structural features are contributing consistent signal but also hitting a ceiling together — one that no single algorithm can push through on its own. An R² of 0.22 for XGBoost means the model explains about 22% of the variance in next-game passing yards, leaving 78% unexplained.
+The improvement is real but modest. The three non-baseline models all landed within half a yard of each other on MAE, which suggests the structural features are contributing consistent signal but also hitting a ceiling together, one that no single algorithm can push through on its own. An R² of 0.22 for XGBoost means the model explains about 22% of the variance in next-game passing yards, leaving 78% unexplained.
 
 This makes sense. Quarterback passing yards are genuinely hard to predict. Even with the best possible information, the game involves injuries, in-game adjustments, turnovers, and individual performances that no pregame feature can anticipate. The models also deliberately exclude the quarterback's own recent yardage, which is one of the stronger autocorrelated signals. The 11% error reduction over the baseline is meaningful given those constraints, and the result confirms the core hypothesis: game context carries real predictive information that does not depend on how many yards the quarterback threw last week.
 
