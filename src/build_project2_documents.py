@@ -31,20 +31,22 @@ try:
             "season",
             "week",
             "game_id",
-            "passer_id",
+            "passer_player_id",   # use correct column name
             "passer_player_name",
             "posteam",
             "defteam",
             "home_team",
             "away_team",
-            "game_date",
-            "temp",
-            "wind",
-            "time_of_day"
-        ]
+            "game_date"
+         ]
     ).agg(
         passing_yards=("passing_yards", "sum"),
-        pass_attempts=("pass_attempt", "sum")
+        pass_attempts=("pass_attempt", "sum"),
+
+        # weather/game context (take first measurement per game)
+        temp=("temp", "first"),
+        wind=("wind", "first"),
+        time_of_day=("time_of_day", "first")
     ).reset_index()
 
     # ============================================================
@@ -52,7 +54,7 @@ try:
     # ============================================================
     
     qb.rename(columns={
-        "passer_id": "player_id",
+        "passer_player_id": "player_id",
         "passer_player_name": "player_name",
         "posteam": "team",
         "defteam": "opponent"
