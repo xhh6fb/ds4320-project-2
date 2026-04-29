@@ -1,7 +1,6 @@
 pandas
 numpy
-scikit-learn
+nfl_data_py
 pymongo
-nflreadpy
-matplotlib
-jupyter
+python-dotenv
+scikit-learn
