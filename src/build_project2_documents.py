@@ -68,8 +68,9 @@ try:
     docs = [row_to_doc(row) for _, row in qb.iterrows()]
 
     # -----------------------------------------
-    # SAVE
+    # SAVE IN DATA FOLDER
     # -----------------------------------------
+    os.makedirs("data", exist_ok=True)
     with open("data/qb_documents.json", "w") as f:
         json.dump(docs, f)
 
