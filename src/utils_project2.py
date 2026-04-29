@@ -27,17 +27,6 @@ def setup_logger(log_file_name):
     return logger
 
 
-def add_rest_days(df, logger):
-    logger.info("Adding rest days")
-
-    df = df.sort_values(["player_id", "season", "week"])
-    df["prev_game"] = df.groupby("player_id")["game_date"].shift(1)
-
-    df["days_rest"] = (df["game_date"] - df["prev_game"]).dt.days
-
-    return df
-
-
 # ================================
 # ROLLING QB FORM FEATURES
 # ================================
@@ -49,7 +38,7 @@ def add_rolling_features(df, logger):
 
     logger.info("Adding rolling QB features (3-game window)")
 
-    df = df.sort_values(["player_id", "game_date"])
+    df = df.sort_values(["player_id", "season", "week"])
 
     # last 3 games passing yards
     df["yards_last3"] = (
@@ -112,19 +101,19 @@ def add_defense_features(pbp, qb, logger):
     # ================================
     # SORT FOR TIME SERIES LOGIC
     # ================================
-    defense = defense.sort_values(["opponent", "season", "week"])
+    defense = defense.sort_values(["defteam", "season", "week"])
 
     # ================================
-    # ROLLING DEFENSE STRENGTH (5-week window)
+    # ROLLING DEFENSE STRENGTH (3-game window)
     # ================================
     defense["def_yards_pg"] = (
-        defense.groupby("opponent")["def_pass_yards"]
-        .transform(lambda x: x.shift().rolling(5).mean())
+        defense.groupby("defteam")["def_pass_yards"]
+        .transform(lambda x: x.shift().rolling(3).mean())
     )
 
     defense["def_tds_pg"] = (
-        defense.groupby("opponent")["def_pass_tds"]
-        .transform(lambda x: x.shift().rolling(5).mean())
+        defense.groupby("defteam")["def_pass_tds"]
+        .transform(lambda x: x.shift().rolling(3).mean())
     )
 
     # rename for merging
