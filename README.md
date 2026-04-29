@@ -11,7 +11,7 @@ This repository contains my DS 4320 project on predicting NFL quarterback next-g
 | Name | Jolie Ng |
 | NetID | xhh6fb |
 | DOI | [![DOI - CHANGE!](https://zenodo.org/badge/DOI/10.5281/zenodo.19363443.svg)](https://doi.org/10.5281/zenodo.19363443) |
-| Press Release | [Can Context Alone Predict a Quarterback's Passing Day?](press_release.md) |
+| Press Release | [Can Context Alone Predict a Quarterback's Passing Day? FIX](press_release.md) |
 | Pipeline | [Notebook](pipeline/project2_pipeline.ipynb) & [Markdown](pipeline/project2_pipeline.md)   |
 | License | [MIT](LICENSE) |
 
