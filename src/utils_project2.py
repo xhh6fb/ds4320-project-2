@@ -95,7 +95,7 @@ def add_qb_form(df, logger):
 # DEFENSE LAST 5 GAMES AVERAGE YARDS (DEFENSE "SKILL")
 # ============================================================
 
-def add_defense_features(df, logger):
+def add_defense_features(pbp, logger):
 
     logger.info("Adding defensive strength features")
 
