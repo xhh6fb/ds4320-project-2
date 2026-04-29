@@ -1,4 +1,4 @@
-# New NFL Document Database Uses Pregame Trends to Project Quarterback Performance
+# New NFL Document Database Uses Pregame Trends to Project QB Performance
 
 ## Hook
 
