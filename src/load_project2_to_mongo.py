@@ -10,7 +10,7 @@ logger = setup_logger("mongo_load.log")
 try:
     logger.info("Connecting to MongoDB")
 
-    client = MongoClient("YOUR_CONNECTION_STRING")
+    client = MongoClient("mongodb+srv://<username>:<password>@cluster0.6mite1b.mongodb.net/?appName=Cluster0")
 
     db = client["project2_db"]
     collection = db["qb_games"]
