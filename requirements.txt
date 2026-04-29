@@ -4,3 +4,6 @@ nfl_data_py
 pymongo
 python-dotenv
 scikit-learn
+xgboost
+matplotlib
+seaborn
