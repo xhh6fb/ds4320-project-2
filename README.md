@@ -198,210 +198,56 @@ Rather than using a raw online table directly as the final dataset, I created a 
 
 This table defines each field in the MongoDB document structure.
 
+### Item 3. Data Dictionary
+
 | Name | Data type | Description | Example |
 |---|---|---|---|
-| game_id | string | Unique game identifier | 2023_10_DAL_PHI |
-| season | integer | NFL season year | 2023 |
-| week | integer | Week of the season | 10 |
-| gameday | date/string | Date of the game | 2023-11-05 |
-| player_info.player_id | string | Unique quarterback/player identifier | 00-0036355 |
-| player_info.player_name | string | Quarterback name | Jalen Hurts |
-| player_info.team | string | Player team abbreviation | PHI |
-| player_info.position | string | Position label | QB |
-| team_context.is_home | boolean | Whether the team is home | true |
-| team_context.days_rest | integer | Days since previous game | 7 |
-| team_context.team_record_before | string | Team record before kickoff | 8-1 |
-| team_context.team_points_for_pg_before | float | Avg points scored per game before kickoff | 28.4 |
-| team_context.team_points_against_pg_before | float | Avg points allowed per game before kickoff | 21.1 |
-| opponent_context.opponent_team | string | Opponent abbreviation | DAL |
-| opponent_context.opponent_record_before | string | Opponent record before kickoff | 5-3 |
-| opponent_context.opponent_points_allowed_pg_before | float | Opponent points allowed per game | 19.8 |
-| pregame_form.games_played_before | integer | Prior games used for features | 8 |
-| pregame_form.pass_attempts_pg_before | float | Avg pass attempts before game | 34.5 |
-| pregame_form.completions_pg_before | float | Avg completions before game | 23.9 |
-| pregame_form.completion_pct_before | float | Completion rate before game | 0.693 |
-| pregame_form.pass_yards_pg_before | float | Avg passing yards before game | 258.7 |
-| pregame_form.pass_tds_pg_before | float | Avg passing TDs before game | 1.9 |
-| pregame_form.interceptions_pg_before | float | Avg interceptions before game | 0.8 |
-| outcome.actual_pass_yards | integer | Passing yards in game | 279 |
-| outcome.actual_pass_tds | integer | Passing TDs in game | 2 |
-| outcome.actual_interceptions | integer | Interceptions in game | 1 |
-
-#### `teams`
-
-| Feature | Data type | Description | Example |
-|---|---|---|---|
-| `team_id` | string | Team abbreviation used as key | `BAL` |
-| `team_name` | string | Full team name | `Baltimore Ravens` |
-| `team_nick` | string | Team nickname | `Ravens` |
-| `team_conf` | string | Conference | `AFC` |
-| `team_division` | string | Division | `AFC North` |
-
-#### `games`
-
-| Feature | Data type | Description | Example |
-|---|---|---|---|
-| `game_id` | string | Unique game identifier | `2023_W01_HOU_at_BAL` |
-| `season` | integer | NFL season year | `2023` |
-| `week` | integer | Regular-season week number | `1` |
-| `gameday` | date | Date of game | `2023-09-10` |
-| `home_team` | string | Home team ID | `BAL` |
-| `away_team` | string | Away team ID | `HOU` |
-| `home_score` | integer | Home final score | `25` |
-| `away_score` | integer | Away final score | `9` |
-| `home_rest` | numeric | Pregame home-team rest days from source data when available | `7` |
-| `away_rest` | numeric | Pregame away-team rest days from source data when available | `7` |
-| `home_moneyline` | numeric | Pregame home-team American moneyline | `-450` |
-| `away_moneyline` | numeric | Pregame away-team American moneyline | `350` |
-| `spread_line` | numeric | Pregame point spread | `9.5` |
-| `total_line` | numeric | Pregame projected total points | `43.5` |
-| `div_game` | integer/boolean | Indicator for division matchup | `0` |
-| `roof` | string | Stadium roof type when available | `outdoor` |
-| `surface` | string | Field surface when available | `grass` |
-| `temp` | numeric | Pregame temperature when available | `75` |
-| `wind` | numeric | Pregame wind speed when available | `8` |
-| `home_win` | integer | 1 if home team won, else 0 | `1` |
-| `winner_team` | string | Winner team ID | `BAL` |
-| `market_home_implied_prob` | float | Implied home-team win probability from home moneyline | `0.818` |
-| `market_away_implied_prob` | float | Implied away-team win probability from away moneyline | `0.222` |
-| `market_implied_prob_diff` | float | Home implied probability minus away implied probability | `0.596` |
-| `sched_rest_diff` | numeric | Home rest minus away rest | `0` |
-
-#### `team_games`
-
-| Feature | Data type | Description | Example |
-|---|---|---|---|
-| `game_id` | string | Foreign key to game | `2023_W01_HOU_at_BAL` |
-| `team_id` | string | Team for the row | `BAL` |
-| `opponent_team` | string | Opponent team ID | `HOU` |
-| `season` | integer | Season year | `2023` |
-| `week` | integer | Week number | `1` |
-| `gameday` | date | Game date | `2023-09-10` |
-| `is_home` | integer | 1 if home, 0 if away | `1` |
-| `points_for` | integer | Points scored by the team | `25` |
-| `points_against` | integer | Points allowed by the team | `9` |
-| `win` | integer | 1 if team won, else 0 | `1` |
-| `games_played_before` | integer | Number of prior games entering this game | `0` |
-| `cum_wins_before` | integer | Prior cumulative wins | `0` |
-| `cum_losses_before` | integer | Prior cumulative losses | `0` |
-| `cum_points_for_before` | numeric | Prior cumulative points scored | `0` |
-| `cum_points_against_before` | numeric | Prior cumulative points allowed | `0` |
-| `pregame_win_pct` | float | Win percentage before this game | `0.500` |
-| `pregame_points_for_pg` | float | Prior scoring average | `0.0` |
-| `pregame_points_against_pg` | float | Prior allowed average | `0.0` |
-| `pregame_point_diff_pg` | float | Prior point differential average | `0.0` |
-| `pregame_last3_points_for_pg` | float | Average points scored over previous 3 games | `0.0` |
-| `pregame_last3_points_against_pg` | float | Average points allowed over previous 3 games | `0.0` |
-| `pregame_last3_win_pct` | float | Win percentage over previous 3 games | `0.500` |
-| `pregame_last3_point_diff_pg` | float | Recent-form point differential over previous 3 games | `0.0` |
-| `days_rest_calc` | numeric | Calculated days since prior game | `7` |
-
-#### `matchups`
-
-| Feature | Data type | Description | Example |
-|---|---|---|---|
-| `game_id` | string | Unique game identifier | `2023_W01_HOU_at_BAL` |
-| `season` | integer | Season year | `2023` |
-| `week` | integer | Week number | `1` |
-| `gameday` | date | Game day | `2023-09-10` |
-| `home_team` | string | Home team ID | `BAL` |
-| `away_team` | string | Away team ID | `HOU` |
-| `home_score` | integer | Home final score | `25` |
-| `away_score` | integer | Away final score | `9` |
-| `home_rest` | numeric | Pregame home-team rest from source data | `7` |
-| `away_rest` | numeric | Pregame away-team rest from source data | `7` |
-| `home_moneyline` | numeric | Pregame home moneyline | `-450` |
-| `away_moneyline` | numeric | Pregame away moneyline | `350` |
-| `spread_line` | numeric | Pregame spread | `9.5` |
-| `total_line` | numeric | Pregame projected total points | `43.5` |
-| `div_game` | integer/boolean | Division-game indicator | `0` |
-| `roof` | string | Roof type | `outdoor` |
-| `surface` | string | Field surface | `grass` |
-| `temp` | numeric | Pregame temperature | `75` |
-| `wind` | numeric | Pregame wind speed | `8` |
-| `home_win` | integer | 1 if home team won, else 0 | `1` |
-| `winner_team` | string | Winner team ID | `BAL` |
-| `market_home_implied_prob` | float | Implied home win probability from moneyline | `0.818` |
-| `market_away_implied_prob` | float | Implied away win probability from moneyline | `0.222` |
-| `market_implied_prob_diff` | float | Home implied probability minus away implied probability | `0.596` |
-| `sched_rest_diff` | numeric | Home source rest minus away source rest | `0` |
-| `home_games_played_before` | integer | Prior home-team games played | `0` |
-| `away_games_played_before` | integer | Prior away-team games played | `0` |
-| `home_cum_wins_before` | integer | Prior cumulative home-team wins | `0` |
-| `away_cum_wins_before` | integer | Prior cumulative away-team wins | `0` |
-| `home_cum_losses_before` | integer | Prior cumulative home-team losses | `0` |
-| `away_cum_losses_before` | integer | Prior cumulative away-team losses | `0` |
-| `home_pregame_win_pct` | float | Home-team pregame win percentage | `0.500` |
-| `away_pregame_win_pct` | float | Away-team pregame win percentage | `0.500` |
-| `home_pregame_points_for_pg` | float | Home-team prior scoring average | `0.0` |
-| `away_pregame_points_for_pg` | float | Away-team prior scoring average | `0.0` |
-| `home_pregame_points_against_pg` | float | Home-team prior points allowed average | `0.0` |
-| `away_pregame_points_against_pg` | float | Away-team prior points allowed average | `0.0` |
-| `home_pregame_point_diff_pg` | float | Home-team prior point differential average | `0.0` |
-| `away_pregame_point_diff_pg` | float | Away-team prior point differential average | `0.0` |
-| `home_pregame_last3_win_pct` | float | Home-team recent 3-game win percentage | `0.500` |
-| `away_pregame_last3_win_pct` | float | Away-team recent 3-game win percentage | `0.500` |
-| `home_pregame_last3_point_diff_pg` | float | Home-team recent 3-game point differential average | `0.0` |
-| `away_pregame_last3_point_diff_pg` | float | Away-team recent 3-game point differential average | `0.0` |
-| `home_days_rest_calc` | numeric | Calculated home-team rest days | `7` |
-| `away_days_rest_calc` | numeric | Calculated away-team rest days | `7` |
-| `pregame_win_pct_diff` | float | Home minus away pregame win percentage | `0.0` |
-| `pregame_points_for_pg_diff` | float | Home minus away prior scoring average | `0.0` |
-| `pregame_points_against_pg_diff` | float | Home minus away prior allowed average | `0.0` |
-| `pregame_point_diff_pg_diff` | float | Home minus away prior point differential average | `0.0` |
-| `games_played_before_diff` | integer | Home minus away prior games played | `0` |
-| `cum_wins_before_diff` | integer | Home minus away cumulative wins | `0` |
-| `cum_losses_before_diff` | integer | Home minus away cumulative losses | `0` |
-| `last3_win_pct_diff` | float | Home minus away recent 3-game win percentage | `0.0` |
-| `last3_point_diff_pg_diff` | float | Home minus away recent 3-game point differential average | `0.0` |
-| `calc_rest_diff` | numeric | Calculated home rest minus away rest | `0` |
-| `target_home_win` | integer | Final prediction target | `1` |
+| `_id` | string | Custom unique identifier for one quarterback-game document | `2024_03_BUF_JAX_00-0034857` |
+| `game_id` | string | Source game identifier when available | `2024_03_BUF_JAX` |
+| `season` | integer | NFL season year | `2024` |
+| `week` | integer | Regular-season week number | `3` |
+| `game_date` | date/string | Calendar date of the game | `2024-09-23` |
+| `game_type` | string | Type of game included in the dataset | `REG` |
+| `player_info.player_id` | string | Quarterback player identifier | `00-0034857` |
+| `player_info.player_name` | string | Quarterback name | `Josh Allen` |
+| `player_info.position` | string | Player position | `QB` |
+| `player_info.team` | string | Quarterback team abbreviation | `BUF` |
+| `game_context.team` | string | Team abbreviation for the quarterback in that game | `BUF` |
+| `game_context.opponent` | string | Opposing team abbreviation | `JAX` |
+| `game_context.is_home` | boolean | Whether the quarterback’s team was home | `False` |
+| `game_context.days_rest` | numeric | Days since the quarterback’s previous game | `7` |
+| `pregame_form.games_played_before` | integer | Number of prior games before the current game | `2` |
+| `pregame_form.avg_pass_yards_last_3` | numeric | Rolling average passing yards over the previous 3 games only | `254.5` |
+| `pregame_form.avg_pass_yards_last_5` | numeric | Rolling average passing yards over the previous 5 games only | `267.8` |
+| `pregame_form.avg_pass_tds_last_3` | numeric | Rolling average passing touchdowns over the previous 3 games only | `2.0` |
+| `pregame_form.avg_pass_tds_last_5` | numeric | Rolling average passing touchdowns over the previous 5 games only | `1.8` |
+| `pregame_form.avg_attempts_last_3` | numeric | Rolling average pass attempts over the previous 3 games only | `35.7` |
+| `pregame_form.avg_attempts_last_5` | numeric | Rolling average pass attempts over the previous 5 games only | `34.4` |
+| `pregame_form.avg_completions_last_3` | numeric | Rolling average completions over the previous 3 games only | `24.3` |
+| `pregame_form.avg_completions_last_5` | numeric | Rolling average completions over the previous 5 games only | `23.8` |
+| `pregame_form.avg_ints_last_3` | numeric | Rolling average interceptions over the previous 3 games only | `0.7` |
+| `pregame_form.season_to_date_pass_yards_pg` | numeric | Prior season-to-date passing yards per game | `262.1` |
+| `pregame_form.season_to_date_pass_tds_pg` | numeric | Prior season-to-date passing touchdowns per game | `1.9` |
+| `pregame_form.season_to_date_attempts_pg` | numeric | Prior season-to-date pass attempts per game | `34.6` |
+| `pregame_form.season_to_date_comp_pct` | numeric | Prior season-to-date completion percentage | `0.678` |
+| `pregame_form.season_to_date_yards_per_attempt` | numeric | Prior season-to-date yards per attempt | `7.57` |
+| `opponent_context.opp_pass_yards_allowed_pg` | numeric | Opponent’s pregame average passing yards allowed per game | `226.0` |
+| `opponent_context.opp_pass_tds_allowed_pg` | numeric | Opponent’s pregame average passing TDs allowed per game | `1.5` |
+| `opponent_context.opp_attempts_faced_pg` | numeric | Opponent’s pregame average pass attempts faced per game | `33.1` |
+| `opponent_context.opp_completions_allowed_pg` | numeric | Opponent’s pregame average completions allowed per game | `22.9` |
+| `targets.passing_yards` | numeric | Actual passing yards in the game; prediction target | `263` |
+| `targets.passing_tds` | numeric | Actual passing touchdowns in the game; prediction target | `2` |
 
 ### Quantification of Uncertainty for Numerical Features - FIX!
 
-Numerical features in this dataset contain inherent uncertainty mainly due to variability in player performance and external game conditions.
+To quantify uncertainty in the numerical features, I summarize the observed distributions of the main engineered variables in the final dataset. Rather than describing uncertainty only in words, I report numerical distribution summaries including the mean, standard deviation, minimum, quartiles, maximum, and missingness rate. This helps show both the range of plausible values and where certain features may be sparse or highly variable.
 
-| Numerical feature | Uncertainty / Limitation |
-|---|---|
-| team_context.days_rest | Usually exact if schedule data is complete, but can be affected by bye weeks, international games, or missing prior game links |
-| team_context.team_points_for_pg_before | Depends on prior games; early-season values are unstable due to small sample sizes |
-| team_context.team_points_against_pg_before | Similar instability as points-for; sensitive to opponent strength and early-season variance |
-| opponent_context.opponent_points_allowed_pg_before | Sensitive to small sample sizes and changes in defensive strength over time |
-| pregame_form.games_played_before | Exact if data is complete, but may vary depending on inclusion of partial appearances |
-| pregame_form.pass_attempts_pg_before | Unstable for quarterbacks with few starts or inconsistent playing time |
-| pregame_form.completions_pg_before | Depends heavily on sample size and game participation consistency |
-| pregame_form.completion_pct_before | Highly sensitive to small denominators and low-attempt games |
-| pregame_form.pass_yards_pg_before | High variance early in season; influenced by matchup and game script |
-| pregame_form.pass_tds_pg_before | Sparse event → high noise and instability |
-| pregame_form.interceptions_pg_before | Rare event → highly volatile and situation-dependent |
-| outcome.actual_pass_yards | Observed statistic; may be updated if official stats are corrected |
-| outcome.actual_pass_tds | Typically exact once games are finalized |
-| outcome.actual_interceptions | Typically exact once official scoring is finalized |
-
-**Quantification methods**
-
-To account for uncertainty, I plan on using the following approaches:
-
-- Variance and standard deviation of rolling features
-- Error residuals between predicted and actual outcomes
-- Comparison of different rolling window sizes (e.g. 3 vs 5 games)
-- Model evaluation using RMSE / MAE (if extended to modeling stage)
-
-**Summary**
-
-Overall, we can't remove uncertainty, but we can explicitly acknowledge and measure it. This is consistent with real-world sports prediction systems where outcomes are inherently stochastic.
-
-| Numerical feature | Source of uncertainty | Quantitative discussion |
-|---|---|---|
-| `home_score / away_score` | Officially recorded outcomes | These are observed final values and are not used as predictors in the final model because they occur after kickoff |
-| `pregame_win_pct` | Small-sample instability early in the season | When `games_played_before` is small, one game can change the estimate sharply; after 1 prior game the value can only be 0 or 1 |
-| `pregame_points_for_pg` | Sampling variation across prior games | Early-season averages are noisy because one unusually high- or low-scoring game strongly changes the estimate |
-| `pregame_points_against_pg` | Sampling variation across prior games | Defensive estimates also stabilize only after several earlier games |
-| `pregame_point_diff_pg` | Inherits uncertainty from two averages | Since it is built from prior points scored and allowed, it compounds uncertainty from both |
-| `pregame_last3_win_pct` | Short-window volatility | This captures recent form but is intentionally sensitive to short-term variation, especially when fewer than 3 prior games exist |
-| `pregame_last3_point_diff_pg` | Short-window volatility | A three-game rolling average is responsive but noisier than full-history averages |
-| `home_rest / away_rest` | Source-field incompleteness | These values can be missing in some rows and may not capture all fatigue-related context such as travel burden |
-| `market_home_implied_prob / market_away_implied_prob` | Derived from moneylines | These are deterministic transformations of betting odds, but betting lines themselves reflect market opinion rather than certainty |
-| `spread_line / total_line` | Pregame market estimate | These are strong predictors, but they represent public expectations and can still be wrong on individual games |
-| `temp / wind` | Environmental context | These can help provide context but may be missing or imperfectly reflect playing conditions inside specific stadium settings |
-| `difference features` | Propagated uncertainty from both teams | Each home-minus-away feature combines uncertainty from two separate team-level estimates, especially in early weeks |
+| Feature | Mean | Std Dev | Min | 25th pct | Median | 75th pct | Max | Missing % |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `pregame_form.avg_pass_yards_last_3` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `pregame_form.avg_pass_tds_last_3` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `game_context.days_rest` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `opponent_context.opp_pass_yards_allowed_pg` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `opponent_context.opp_pass_tds_allowed_pg` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `targets.passing_yards` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
+| `targets.passing_tds` | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE | REPLACE |
