@@ -1,24 +1,60 @@
-# python
+# -----------------------
+# Python
+# -----------------------
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# env / secrets
-.env
-
-# jupyter
-.ipynb_checkpoints/
-
-# logs
-logs/*.log
-
-# system
-.DS_Store
-
-# local virtual environments
+# virtual environments
 venv/
+env/
 .venv/
 
-# optionally ignore large outputs
-data/raw/
+# -----------------------
+# Data files
+# -----------------------
+data/
+*.json
+*.csv
+*.parquet
+
+# keep structure if needed
+!data/.gitkeep
+
+# -----------------------
+# Logs
+# -----------------------
+*.log
+
+# -----------------------
+# MongoDB / secrets
+# -----------------------
+.env
+*.env
+
+# Never commit credentials
+credentials.json
+
+# -----------------------
+# Jupyter
+# -----------------------
+.ipynb_checkpoints/
+
+# -----------------------
+# OS files
+# -----------------------
+.DS_Store
+
+# -----------------------
+# IDEs
+# -----------------------
+.vscode/
+.idea/
+
+# -----------------------
+# Model artifacts (for ML)
+# -----------------------
+*.pkl
+*.joblib
+models/
