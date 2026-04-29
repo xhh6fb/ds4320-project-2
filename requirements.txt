@@ -4,7 +4,6 @@ pandas>=2.1.0
 nfl_data_py
 
 pymongo>=4.6.0
-python-dotenv>=1.0.0
 
 scikit-learn
 xgboost
