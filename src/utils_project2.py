@@ -1,9 +1,9 @@
 import pandas as pd
 import logging
 
-# ================================
+# ============================================================
 # LOGGER SETUP
-# ================================
+# ============================================================
 def setup_logger(log_file_name):
     """
     Creates a logger that writes pipeline logs to a file.
@@ -26,151 +26,83 @@ def setup_logger(log_file_name):
 
     return logger
 
+# ============================================================
+# REST DAYS (PREVIOUS GAME ONLY SO NO LEAKAGE)
+# ============================================================
+def add_rest_days(df, logger):
 
-# ================================
-# ROLLING QB FORM FEATURES
-# ================================
-def add_rolling_features(df, logger):
-    """
-    Creates short-term QB performance features.
-    IMPORTANT: uses shift() to prevent data leakage.
-    """
+    logger.info("Adding rest days")
 
-    logger.info("Adding rolling QB features (3-game window)")
+    df = df.sort_values(["passer_id", "season", "week"])
 
-    df = df.sort_values(["player_id", "season", "week"])
+    df["prev_game_date"] = df.groupby("passer_id")["game_date"].shift(1)
 
-    # last 3 games passing yards
-    df["yards_last3"] = (
-        df.groupby("player_id")["passing_yards"]
-        .transform(lambda x: x.shift().rolling(3).mean())
-    )
+    df["days_rest"] = (df["game_date"] - df["prev_game_date"]).dt.days
 
-    # last 3 games TDs
-    df["tds_last3"] = (
-        df.groupby("player_id")["passing_tds"]
-        .transform(lambda x: x.shift().rolling(3).mean())
-    )
+    return df
 
-    # last 3 games attempts
-    df["atts_last3"] = (
-        df.groupby("player_id")["attempts"]
-        .transform(lambda x: x.shift().rolling(3).mean())
+# ============================================================
+# WEATHER CLEANING
+# ============================================================
+def add_weather_features(df, logger):
+
+    logger.info("Processing weather features")
+
+    # convert to numeric safely
+    df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
+    df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
+
+    df["bad_weather"] = ((df["wind"] > 15) | (df["temp"] < 32)).astype(int)
+
+    return df
+
+# ============================================================
+# HOME OR AWAY
+# ============================================================
+def add_home_away(df, logger):
+
+    logger.info("Adding home/away feature")
+
+    df["is_home"] = (df["posteam"] == df["home_team"]).astype(int)
+
+    return df
+
+# ============================================================
+# QB LAST 5 GAMES AVERAGE YARDS (QB "SKILL")
+# ============================================================
+def add_qb_form(df, logger):
+
+    logger.info("Adding QB last 5 games form")
+
+    df = df.sort_values(["passer_id", "game_date"])
+
+    df["yards_last5"] = (
+        df.groupby("passer_id")["passing_yards"]
+        .transform(lambda x: x.shift().rolling(5).mean())
     )
 
     return df
 
+# ============================================================
+# DEFENSE LAST 5 GAMES AVERAGE YARDS (DEFENSE "SKILL")
+# ============================================================
+def add_defense_features(df, logger):
 
-# ================================
-# EXTENDED EFFICIENCY FEATURES
-# ================================
-def add_extended_rolling_features(df, logger):
-    """
-    Adds derived efficiency metrics.
-    """
+    logger.info("Adding defensive strength features")
 
-    logger.info("Adding extended QB efficiency features")
-
-    # efficiency per attempt
-    df["yards_per_attempt"] = df["passing_yards"] / df["attempts"]
-
-    return df
-
-
-# ================================
-# DEFENSE STRENGTH FEATURES
-# ================================
-def add_defense_features(pbp, qb, logger):
-    """
-    Builds opponent defensive strength metrics
-    and merges them into QB dataset.
-    """
-
-    logger.info("Building defensive strength features")
-
-    # ================================
-    # AGGREGATE DEFENSE PERFORMANCE
-    # ================================
-    defense = pbp.groupby(
+    defense = df.groupby(
         ["season", "week", "defteam"]
     ).agg(
-        def_pass_yards=("passing_yards", "sum"),
-        def_pass_tds=("pass_touchdown", "sum"),
+        def_pass_yards=("passing_yards", "mean"),
     ).reset_index()
 
-    # ================================
-    # SORT FOR TIME SERIES LOGIC
-    # ================================
     defense = defense.sort_values(["defteam", "season", "week"])
 
-    # ================================
-    # ROLLING DEFENSE STRENGTH (3-game window)
-    # ================================
     defense["def_yards_pg"] = (
         defense.groupby("defteam")["def_pass_yards"]
-        .transform(lambda x: x.shift().rolling(3).mean())
+        .transform(lambda x: x.shift().rolling(5).mean())
     )
 
-    defense["def_tds_pg"] = (
-        defense.groupby("defteam")["def_pass_tds"]
-        .transform(lambda x: x.shift().rolling(3).mean())
-    )
-
-    # rename for merging
     defense.rename(columns={"defteam": "opponent"}, inplace=True)
 
-    # ================================
-    # MERGE INTO QB DATASET
-    # ================================
-    qb = qb.merge(
-        defense,
-        on=["season", "week", "opponent"],
-        how="left"
-    )
-
-    return qb
-
-
-# ============================================================
-# RELATIVE STRENGTH FEATURES (KEY IMPROVEMENT)
-# ============================================================
-
-def add_relative_features(df, logger):
-
-    logger.info("Adding relative strength features")
-
-    # --------------------------------------------------------
-    # QB FORM RELATIVE TO LEAGUE CONTEXT
-    # --------------------------------------------------------
-    df["qb_yard_over_avg"] = df["yards_last3"] - df["yards_last3"].mean()
-
-    # --------------------------------------------------------
-    # DEFENSE ADJUSTMENT (VERY IMPORTANT)
-    # higher = easier matchup
-    # --------------------------------------------------------
-    df["def_easiness"] = df["def_yards_pg"].mean() - df["def_yards_pg"]
-
-    # --------------------------------------------------------
-    # VOLUME × EFFICIENCY INTERACTION
-    # --------------------------------------------------------
-    df["volume_efficiency"] = df["atts_last3"] * df["yards_per_attempt"]
-
-    return df
-
-
-def add_interaction_features(df, logger):
-
-    logger.info("Adding interaction features")
-
-    # --------------------------------------------------------
-    # QB FORM × DEFENSE STRENGTH
-    # THIS IS CRITICAL FOR NFL DATA
-    # --------------------------------------------------------
-    df["form_vs_def"] = df["yards_last3"] / (df["def_yards_pg"] + 1)
-
-    # --------------------------------------------------------
-    # ATTEMPTS × DEFENSE (game script signal)
-    # --------------------------------------------------------
-    df["volume_vs_def"] = df["atts_last3"] * df["def_yards_pg"]
-
-    return df
+    return defense
