@@ -35,7 +35,12 @@ try:
         "defteam": "opponent"
     }, inplace=True)
 
-    logger.info(f"After aggregation: {len(qb)} rows")
+    # -----------------------------------------
+    # FILTER LOW SAMPLE GAMES
+    # -----------------------------------------
+    qb = qb[qb["attempts"] >= 5]
+
+    logger.info(f"After aggregation and filtering: {len(qb)} rows")
 
     # -----------------------------------------
     # APPLY FEATURE ENGINEERING PIPELINE
