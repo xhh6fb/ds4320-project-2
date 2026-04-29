@@ -31,11 +31,11 @@ def setup_logger(log_file_name):
 # ============================================================
 def add_rest_days(df, logger):
 
-    logger.info("Adding rest days")
+    logger.info("Adding rest days feature")
 
-    df = df.sort_values(["passer_id", "season", "week"])
+    df = df.sort_values(["player_id", "game_date"])
 
-    df["prev_game_date"] = df.groupby("passer_id")["game_date"].shift(1)
+    df["prev_game_date"] = df.groupby("player_id")["game_date"].shift(1)
 
     df["days_rest"] = (df["game_date"] - df["prev_game_date"]).dt.days
 
@@ -63,7 +63,7 @@ def add_home_away(df, logger):
 
     logger.info("Adding home/away feature")
 
-    df["is_home"] = (df["posteam"] == df["home_team"]).astype(int)
+    df["is_home"] = (df["team"] == df["home_team"]).astype(int)
 
     return df
 
@@ -74,10 +74,10 @@ def add_qb_form(df, logger):
 
     logger.info("Adding QB last 5 games form")
 
-    df = df.sort_values(["passer_id", "game_date"])
+    df = df.sort_values(["player_id", "game_date"])
 
     df["yards_last5"] = (
-        df.groupby("passer_id")["passing_yards"]
+        df.groupby("player_id")["passing_yards"]
         .transform(lambda x: x.shift().rolling(5).mean())
     )
 
@@ -90,19 +90,23 @@ def add_defense_features(df, logger):
 
     logger.info("Adding defensive strength features")
 
-    defense = df.groupby(
+    # aggregate defense per game
+    defense = pbp.groupby(
         ["season", "week", "defteam"]
     ).agg(
-        def_pass_yards=("passing_yards", "mean"),
+        def_pass_yards=("passing_yards", "mean")
     ).reset_index()
 
+    # ensure correct ordering
     defense = defense.sort_values(["defteam", "season", "week"])
 
+    # rolling defensive strength (past only)
     defense["def_yards_pg"] = (
         defense.groupby("defteam")["def_pass_yards"]
         .transform(lambda x: x.shift().rolling(5).mean())
     )
 
+    # rename for merge
     defense.rename(columns={"defteam": "opponent"}, inplace=True)
 
     return defense
