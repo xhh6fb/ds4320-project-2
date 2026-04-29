@@ -129,3 +129,48 @@ def add_defense_features(pbp, qb, logger):
     )
 
     return qb
+
+
+# ============================================================
+# RELATIVE STRENGTH FEATURES (KEY IMPROVEMENT)
+# ============================================================
+
+def add_relative_features(df, logger):
+
+    logger.info("Adding relative strength features")
+
+    # --------------------------------------------------------
+    # QB FORM RELATIVE TO LEAGUE CONTEXT
+    # --------------------------------------------------------
+    df["qb_yard_over_avg"] = df["yards_last3"] - df["yards_last3"].mean()
+
+    # --------------------------------------------------------
+    # DEFENSE ADJUSTMENT (VERY IMPORTANT)
+    # higher = easier matchup
+    # --------------------------------------------------------
+    df["def_easiness"] = df["def_yards_pg"].mean() - df["def_yards_pg"]
+
+    # --------------------------------------------------------
+    # VOLUME × EFFICIENCY INTERACTION
+    # --------------------------------------------------------
+    df["volume_efficiency"] = df["atts_last3"] * df["yards_per_attempt"]
+
+    return df
+
+
+def add_interaction_features(df, logger):
+
+    logger.info("Adding interaction features")
+
+    # --------------------------------------------------------
+    # QB FORM × DEFENSE STRENGTH
+    # THIS IS CRITICAL FOR NFL DATA
+    # --------------------------------------------------------
+    df["form_vs_def"] = df["yards_last3"] / (df["def_yards_pg"] + 1)
+
+    # --------------------------------------------------------
+    # ATTEMPTS × DEFENSE (game script signal)
+    # --------------------------------------------------------
+    df["volume_vs_def"] = df["atts_last3"] * df["def_yards_pg"]
+
+    return df
