@@ -77,16 +77,16 @@ This project lives in the domain of sports analytics, with a specific focus on N
  
 ### Background Reading
 
-My OneDrive folder [DS4320 Project 2 Background Reading](https://myuva-my.sharepoint.com/:f:/g/personal/xhh6fb_virginia_edu/IgC-Mn_orQyjRp3d7qAwHAhNAYPykaYrIQBMBeFxQXjiRuw?e=5fNlV8) contains readings explaining the football analytics context of this project.
+My OneDrive folder [DS4320 Project 2 Background Reading](https://myuva-my.sharepoint.com/:f:/g/personal/xhh6fb_virginia_edu/IgC-Mn_orQyjRp3d7qAwHAhNAYPykaYrIQBMBeFxQXjiRuw?e=ZiLZca) contains readings explaining the football analytics context of this project.
 For convenience, I also have the readings stored in this Github repo in the [`background_reading`](background_reading) folder.
 
 | Index | Title | Brief Description | Github Path | OneDrive Path |
 |---|---|---|---|---|
-| 1 | nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Reproducible NFL offensive player evaluation using WAR models | [Link](background_reading/01_nflwar.pdf) | [Link](onedrive) |
-| 2 | A Reinforcement Learning Based Approach to Play Calling in Football | Uses reinforcement learning to optimize football play-calling decisions | [Link](background_reading/02_reinforcement_learning_approach_to_play_calling.pdf) | [Link](onedrive) |
-| 3 | NFL Play Prediction | Machine learning models predicting NFL play outcomes and yardage | [Link](background_reading/03_nfl_play_prediction.pdf) | [Link](onedrive) |
-| 4 | The Quarterback Prediction Problem: Forecasting NFL QB Performance | Illustrates the difficulty of predicting QB performance from limited or pre-draft data | [Link](background_reading/04_quarterback_prediction_problem.pdf) | [Link](onedrive) |
-| 5 | next-gen-scraPy: Extracting NFL Tracking Data to Evaluate Quarterbacks and Pass Defenses | Extracts tracking data to evaluate quarterbacks and pass defenses using air yards and route metrics | [Link](background_reading/05_next_gen_scrapy.pdf) | [Link](onedrive) |
+| 1 | nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Reproducible NFL offensive player evaluation using WAR models | [Link](background_reading/01_nflwar.pdf) | [Link](https://myuva-my.sharepoint.com/:b:/g/personal/xhh6fb_virginia_edu/IQBveOzDivz-ToCnxDH7yWIkAQSwZw88qENRVEIs1yBqv-Q?e=dMNfYf) |
+| 2 | A Reinforcement Learning Based Approach to Play Calling in Football | Uses reinforcement learning to optimize football play-calling decisions | [Link](background_reading/02_reinforcement_learning_approach_to_play_calling.pdf) | [Link](https://myuva-my.sharepoint.com/:b:/g/personal/xhh6fb_virginia_edu/IQBO0102i6QkR6WlO614cE8GAYW_TAGzv-aIXWM85DI2IQY?e=sZEY8s) |
+| 3 | NFL Play Prediction | Machine learning models predicting NFL play outcomes and yardage | [Link](background_reading/03_nfl_play_prediction.pdf) | [Link](https://myuva-my.sharepoint.com/:b:/g/personal/xhh6fb_virginia_edu/IQDkVx9F1ETNTKlmygqcTWKxAXSdOl_07PzybnKjfPLqqkg?e=RM2biF) |
+| 4 | The Quarterback Prediction Problem: Forecasting NFL QB Performance | Illustrates the difficulty of predicting QB performance from limited or pre-draft data | [Link](background_reading/04_quarterback_prediction_problem.pdf) | [Link](https://myuva-my.sharepoint.com/:b:/g/personal/xhh6fb_virginia_edu/IQBcoltTSCQZR6fGZx43-3dQAYFkuYyUX3S_Z0ETRLv9Leo?e=fBwaZJ) |
+| 5 | next-gen-scraPy: Extracting NFL Tracking Data to Evaluate Quarterbacks and Pass Defenses | Extracts tracking data to evaluate quarterbacks and pass defenses using air yards and route metrics | [Link](background_reading/05_next_gen_scrapy.pdf) | [Link](https://myuva-my.sharepoint.com/:b:/g/personal/xhh6fb_virginia_edu/IQADVfgKtjPPQa0oFO7cEBmEAVxUZOK-9DkI1azoQnXRBpY?e=oJlO96) |
 
 <br>
 
