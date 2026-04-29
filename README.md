@@ -12,7 +12,7 @@ This repository contains my DS 4320 project on predicting NFL quarterback next-g
 | NetID | xhh6fb |
 | DOI | [![DOI - CHANGE!](https://zenodo.org/badge/DOI/10.5281/zenodo.19363443.svg)](https://doi.org/10.5281/zenodo.19363443) |
 | Press Release | [Can Context Alone Predict a Quarterback's Passing Day?](press_release.md) |
-| Pipeline | [Notebook - UPLOAD!](pipeline/project_2_pipeline.ipynb) & [Markdown - UPLOAD!](pipeline/project_2_pipeline.md)   |
+| Pipeline | [Notebook](pipeline/project2_pipeline.ipynb) & [Markdown](pipeline/project2_pipeline.md)   |
 | License | [MIT](LICENSE) |
 
 <br>
@@ -73,16 +73,17 @@ I refined the problem from broad athletic performance prediction to a targeted t
 This project lives in the domain of sports analytics, with a specific focus on NFL offensive performance modeling. Sports analytics uses historical game and player data to answer questions about evaluation, prediction, and strategy. Within that domain, quarterback passing projection is one of the most studied problems because passing production directly drives scoring and game outcomes. This project takes a non-standard approach by restricting the model's inputs to structural, contextual features — opponent pass-defense quality, betting market lines, usage share, weather, and scheduling — and excluding the quarterback's own historical passing yardage. The domain-specific insight motivating this design is that game context explains a large share of passing volume variance: a quarterback facing a weak defense in a high-total game with expected negative game script will throw more, regardless of what they did last week. Testing whether that hypothesis holds quantitatively requires deliberately removing the convenience of historical yards and seeing what remains.
  
 ### Background Reading
- 
-The [`background_reading`](background_reading) folder contains readings explaining the football analytics context of this project.
 
-| Index | Title | Brief Description | Path |
-|---|---|---|---|
-| 1 | nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Reproducible NFL offensive player evaluation using WAR models | [Link](background_reading/01_nflwar.pdf) |
-| 2 | A Reinforcement Learning Based Approach to Play Calling in Football | Uses reinforcement learning to optimize football play-calling decisions | [Link](background_reading/02_reinforcement_learning_approach_to_play_calling.pdf) |
-| 3 | NFL Play Prediction | Machine learning models predicting NFL play outcomes and yardage | [Link](background_reading/03_nfl_play_prediction.pdf) |
-| 4 | The Quarterback Prediction Problem: Forecasting NFL QB Performance | Illustrates the difficulty of predicting QB performance from limited or pre-draft data | [Link](background_reading/04_quarterback_prediction_problem.pdf) |
-| 5 | next-gen-scraPy: Extracting NFL Tracking Data to Evaluate Quarterbacks and Pass Defenses | Extracts tracking data to evaluate quarterbacks and pass defenses using air yards and route metrics | [Link](background_reading/05_next_gen_scrapy.pdf) |
+My [OneDrive folder](onedrive) contains readings explaining the football analytics context of this project.
+For convenience, I also have the readings stored here in Github in the [`background_reading`](background_reading) folder.
+
+| Index | Title | Brief Description | Github Path | OneDrive Path |
+|---|---|---|---|---|
+| 1 | nflWAR: A Reproducible Method for Offensive Player Evaluation in Football | Reproducible NFL offensive player evaluation using WAR models | [Link](background_reading/01_nflwar.pdf) | [Link](onedrive) |
+| 2 | A Reinforcement Learning Based Approach to Play Calling in Football | Uses reinforcement learning to optimize football play-calling decisions | [Link](background_reading/02_reinforcement_learning_approach_to_play_calling.pdf) | [Link](onedrive) |
+| 3 | NFL Play Prediction | Machine learning models predicting NFL play outcomes and yardage | [Link](background_reading/03_nfl_play_prediction.pdf) | [Link](onedrive) |
+| 4 | The Quarterback Prediction Problem: Forecasting NFL QB Performance | Illustrates the difficulty of predicting QB performance from limited or pre-draft data | [Link](background_reading/04_quarterback_prediction_problem.pdf) | [Link](onedrive) |
+| 5 | next-gen-scraPy: Extracting NFL Tracking Data to Evaluate Quarterbacks and Pass Defenses | Extracts tracking data to evaluate quarterbacks and pass defenses using air yards and route metrics | [Link](background_reading/05_next_gen_scrapy.pdf) | [Link](onedrive) |
 
 <br>
 
@@ -100,8 +101,6 @@ From this raw table, I construct two types of aggregations. The first is a quart
 |---|---|---|
 | `src/build_project2.py` | Loads raw nflverse play-by-play data, aggregates to QB-game level, computes team-level pass attempts for usage share, merges betting line and weather features, calls the utils feature pipeline, joins defensive context, and writes the final CSV | [`src/build_project2.py`](src/build_project2.py) |
 | `src/utils_project2.py` | Helper functions for logging, QB rolling form, rest days, weather flags, home/away indicator, and the rolling opponent pass-defense feature pipeline | [`src/utils_project2.py`](src/utils_project2.py) |
-| `src/load_project2_to_mongo.py` | Connects to MongoDB Atlas and inserts prepared quarterback documents into the target collection | [`src/load_project2_to_mongo.py`](src/load_project2_to_mongo.py) |
-| `src/sample_mongosh_queries.js` | Example `mongosh` commands for checking, querying, and summarizing the MongoDB collection | [`src/sample_mongosh_queries.js`](src/sample_mongosh_queries.js) |
 | `pipeline/project2_pipeline.ipynb` | Queries MongoDB into a dataframe, runs the modeling pipeline excluding historical yards features, evaluates predictions, and generates visualizations | [`pipeline/project2_pipeline.ipynb`](pipeline/project2_pipeline.ipynb) |
 | `pipeline/project2_pipeline.md` | Markdown export of the notebook pipeline | [`pipeline/project2_pipeline.md`](pipeline/project2_pipeline.md) |
  
@@ -240,7 +239,7 @@ Stores actual postgame outcomes used for model evaluation.
 | Database | MongoDB Atlas |
 | Database Name | `nfl_project` |
 | Collection | `quarterback_games` |
-| Main Dataset File | `data/qb_games.csv` |
+| Main Dataset File | [`data/qb_games.csv`](data/qb_games.csv) |
 | Primary Target Variable | `passing_yards` |
 | Key Predictor Categories | Opponent defense (EPA, success rate, air yards, YAC), market lines (spread, total), weather, usage (qb_pass_share), scheduling (days_rest, is_home) |
 | Excluded from Prediction | QB's own historical passing yards (`yards_last5`) |
