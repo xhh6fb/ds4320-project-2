@@ -77,7 +77,7 @@ This project lives in the domain of sports analytics, with a specific focus on N
  
 ### Background Reading
 
-My OneDrive folder [DS4320 Project 2 Background Reading]((https://myuva-my.sharepoint.com/:f:/g/personal/xhh6fb_virginia_edu/IgC-Mn_orQyjRp3d7qAwHAhNAYPykaYrIQBMBeFxQXjiRuw?e=5fNlV8)) contains readings explaining the football analytics context of this project.
+My OneDrive folder [DS4320 Project 2 Background Reading](https://myuva-my.sharepoint.com/:f:/g/personal/xhh6fb_virginia_edu/IgC-Mn_orQyjRp3d7qAwHAhNAYPykaYrIQBMBeFxQXjiRuw?e=5fNlV8) contains readings explaining the football analytics context of this project.
 For convenience, I also have the readings stored in this Github repo in the [`background_reading`](background_reading) folder.
 
 | Index | Title | Brief Description | Github Path | OneDrive Path |
