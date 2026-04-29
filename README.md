@@ -177,6 +177,8 @@ Since this is a document-model project, the logical schema is a soft schema** in
 
 ### Data Summary - FIX!
 
+Rather than using a raw online table directly as the final dataset, I created a custom secondary dataset specifically tailored to the project question of predicting quarterback next-game passing yards and passing touchdowns. The raw source data came from nflverse through the `nflreadpy` Python package, but I filtered those raw tables to regular-season quarterback observations, merged schedule context, identified the quarterback’s opponent and home/away status, calculated rest days, and engineered rolling pregame performance summaries. I also created opponent pass-defense context features based on what opposing defenses had allowed before each game. The result is a purpose-built quarterback-game document dataset designed for pregame forecasting rather than a generic download of public source data.
+
 | Collection | Description |
 |---|---|
 | Data Source | nflverse (via nflreadpy Python package) |
