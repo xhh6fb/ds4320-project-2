@@ -21,8 +21,7 @@ try:
     # QB GAME LEVEL AGGREGATION
     # -----------------------------------------
     qb = pbp.groupby(
-        ["game_id", "season", "week", "game_date",
-         "passer_id", "passer_player_name", "posteam", "defteam"]
+        ["season", "week", "passer_id", "passer_player_name", "posteam", "defteam"]
     ).agg(
         passing_yards=("passing_yards", "sum"),
         passing_tds=("pass_touchdown", "sum"),
@@ -36,11 +35,7 @@ try:
         "defteam": "opponent"
     }, inplace=True)
 
-    qb = qb[qb["attempts"] >= 5]
-
     logger.info(f"After aggregation: {len(qb)} rows")
-
-    qb = qb.sort_values(["player_id", "game_date"])
 
     # -----------------------------------------
     # APPLY FEATURE ENGINEERING PIPELINE
@@ -62,8 +57,6 @@ try:
     qb.to_csv(output_path, index=False)
 
     logger.info(f"Saved dataset to {output_path}")
-
-    print("BUILD COMPLETE. DATA READY FOR ML PIPELINE")
 
 except Exception as e:
     logger.error("PIPELINE FAILED")
