@@ -6,7 +6,7 @@ Every week during the NFL season, analysts and fans alike ask the same question:
 
 ## Problem Statement: History-Based Predictions Leave a Blind Spot
 
-The most common approach to projecting quarterback passing production relies on the quarterback's own recent statistics. Feed in last week's yardage totals, average them over a few games, and use that as your forecast. The problem is that this approach collapses when you need it most — for a quarterback returning from injury, a new starter with no track record, or a player who just changed teams. The historical record is thin or missing entirely, and the prediction falls apart.
+The most common approach to projecting quarterback passing production relies on the quarterback's own recent statistics. Feed in last week's yardage totals, average them over a few games, and use that as your forecast. The problem is that this approach collapses when you need it most. For a quarterback returning from injury, a new starter with no track record, or a player who just changed teams. The historical record is thin or missing entirely, and the prediction falls apart.
 
 There is a deeper issue, too. Raw yardage totals from past games do not tell you *why* a quarterback threw for a lot or a little. Was the defense weak? Was the game environment expected to be high-scoring? Was the offense trailing and forced to throw? The structural factors that drive passing volume before a single snap is taken are fully knowable before kickoff. The question this project set out to answer is whether those factors alone, without any historical yardage, can produce meaningful predictions.
 
