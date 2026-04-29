@@ -1,10 +1,9 @@
-// switch database
 use project2_db
 
-// view documents
+// sample documents
 db.qb_games.find().limit(5)
 
-// filter by QB
+// filter QB
 db.qb_games.find({
   "player_info.player_name": "Patrick Mahomes"
 })
@@ -14,7 +13,12 @@ db.qb_games.find({
   "targets.passing_yards": { $gt: 300 }
 })
 
-// aggregation example
+// rolling performance check
+db.qb_games.find({
+  "pregame_form.yards_last3": { $gt: 250 }
+})
+
+// aggregation: average yards per QB
 db.qb_games.aggregate([
   {
     $group: {
