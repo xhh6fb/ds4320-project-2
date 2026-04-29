@@ -1,122 +1,109 @@
 import pandas as pd
 import logging
 
-# -----------------------------------------
-# LOGGING SETUP FUNCTION
-# This creates a logger that writes to file
-# -----------------------------------------
+
 def setup_logger(log_file_name):
-    """
-    Creates and returns a logger object.
-    Logs will be written to the specified file.
-
-    Parameters:
-        log_file_name (str): name of the log file
-
-    Returns:
-        logger object
-    """
-
     logger = logging.getLogger(log_file_name)
 
-    # prevent duplicate handlers if rerun
     if not logger.handlers:
         logger.setLevel(logging.INFO)
-
-        file_handler = logging.FileHandler(log_file_name)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(levelname)s - %(message)s"
-        )
-        file_handler.setFormatter(formatter)
-
-        logger.addHandler(file_handler)
+        fh = logging.FileHandler(log_file_name)
+        fmt = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        fh.setFormatter(fmt)
+        logger.addHandler(fh)
 
     return logger
 
 
-# -----------------------------------------
-# SAFE COLUMN ACCESS
-# avoids crashing if column missing
-# -----------------------------------------
-def safe_col(df, col, default=0):
-    if col in df.columns:
-        return df[col]
-    return pd.Series(default, index=df.index)
-
-
-# -----------------------------------------
-# ADD REST DAYS FEATURE
-# -----------------------------------------
 def add_rest_days(df, logger):
-    logger.info("Adding rest days feature")
+    logger.info("Adding rest days")
 
     df = df.sort_values(["player_id", "season", "week"])
+    df["prev_game"] = df.groupby("player_id")["game_date"].shift(1)
 
-    df["prev_game_date"] = df.groupby("player_id")["game_date"].shift(1)
-
-    df["days_rest"] = (
-        df["game_date"] - df["prev_game_date"]
-    ).dt.days
+    df["days_rest"] = (df["game_date"] - df["prev_game"]).dt.days
 
     return df
 
 
-# -----------------------------------------
-# ADD ROLLING FEATURES (NO LEAKAGE)
-# -----------------------------------------
+# -----------------------------
+# CORE ROLLING FEATURES
+# -----------------------------
 def add_rolling_features(df, logger):
-    logger.info("Creating rolling features")
+    logger.info("Rolling features (3-game)")
 
     df = df.sort_values(["player_id", "season", "week"])
 
-    # IMPORTANT:
-    # shift() ensures we ONLY use past games
-    df["avg_pass_yards_last_3"] = (
+    df["yards_last3"] = (
         df.groupby("player_id")["passing_yards"]
         .transform(lambda x: x.shift().rolling(3).mean())
     )
 
-    df["avg_pass_tds_last_3"] = (
+    df["tds_last3"] = (
         df.groupby("player_id")["passing_tds"]
+        .transform(lambda x: x.shift().rolling(3).mean())
+    )
+
+    df["atts_last3"] = (
+        df.groupby("player_id")["attempts"]
         .transform(lambda x: x.shift().rolling(3).mean())
     )
 
     return df
 
-# -----------------------------------------
-# ADD DEFENSE FEATURES
-# -----------------------------------------
+
+# -----------------------------
+# EXTRA FEATURES FOR YOUR MODEL
+# -----------------------------
+def add_extended_rolling_features(df, logger):
+    logger.info("Extended rolling features")
+
+    df["yards_last5"] = (
+        df.groupby("player_id")["passing_yards"]
+        .transform(lambda x: x.shift().rolling(5).mean())
+    )
+
+    df["yards_per_attempt"] = df["passing_yards"] / df["attempts"]
+
+    return df
+
+
+# -----------------------------
+# DEFENSE FEATURES
+# -----------------------------
 def add_defense_features(pbp, logger):
-    logger.info("Building defensive features")
+    logger.info("Defense features")
 
-    defense = pbp.groupby(
-        ["season", "week", "defteam"]
-    ).agg({
-        "passing_yards": "sum",
-        "pass_touchdown": "sum",
-        "pass_attempt": "sum"
-    }).reset_index()
+    defense = pbp.groupby(["season", "week", "defteam"]).agg(
+        def_pass_yards=("passing_yards", "sum"),
+        def_pass_tds=("pass_touchdown", "sum"),
+        def_pass_att=("pass_attempt", "sum")
+    ).reset_index()
 
-    defense.columns = [
-        "season", "week", "team",
-        "def_pass_yards",
-        "def_pass_tds",
-        "def_pass_atts"
-    ]
+    defense = defense.sort_values(["defteam", "season", "week"])
 
-    defense = defense.sort_values(["team", "season", "week"])
+    defense["def_yards_pg"] = (
+        defense.groupby("defteam")["def_pass_yards"]
+        .transform(lambda x: x.shift().rolling(5).mean())
+    )
 
-    defense["def_yards_pg"] = defense.groupby("team")["def_pass_yards"].transform(lambda x: x.shift().rolling(5).mean())
-    defense["def_tds_pg"] = defense.groupby("team")["def_pass_tds"].transform(lambda x: x.shift().rolling(5).mean())
+    defense["def_tds_pg"] = (
+        defense.groupby("defteam")["def_pass_tds"]
+        .transform(lambda x: x.shift().rolling(5).mean())
+    )
+
+    defense.rename(columns={"defteam": "team"}, inplace=True)
 
     return defense
 
-# -----------------------------------------
-# CONVERT ROW → MONGODB DOCUMENT
-# -----------------------------------------
+
+# -----------------------------
+# MONGO DOCUMENT FORMAT
+# -----------------------------
 def row_to_doc(row):
     return {
         "_id": f"{row['season']}_{row['week']}_{row['player_id']}",
+
         "season": int(row["season"]),
         "week": int(row["week"]),
 
@@ -127,8 +114,7 @@ def row_to_doc(row):
         },
 
         "game_context": {
-            "opponent": row["opponent"],
-            "is_home": True
+            "opponent": row["opponent"]
         },
 
         "pregame_form": {
@@ -140,8 +126,8 @@ def row_to_doc(row):
         },
 
         "opponent_context": {
-            "opp_pass_yards_pg": row["def_yards_pg"],
-            "opp_pass_tds_pg": row["def_tds_pg"]
+            "opp_def_yards_pg": row["def_yards_pg"],
+            "opp_def_tds_pg": row["def_tds_pg"]
         },
 
         "targets": {
