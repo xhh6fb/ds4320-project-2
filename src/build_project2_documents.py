@@ -29,19 +29,17 @@ try:
     # AGGREGATE TO QB-GAME LEVEL
     # -----------------------------------------
     qb = pbp.groupby(
-        ["season", "week", "passer_id", "passer_player_name"]
+        ["season", "week", "passer_id", "passer_player_name", "posteam", "defteam"]
     ).agg({
         "passing_yards": "sum",
         "pass_touchdown": "sum",
-        "interception": "sum",
-        "complete_pass": "sum",
         "pass_attempt": "sum"
     }).reset_index()
 
     qb.columns = [
         "season", "week", "player_id", "player_name",
-        "passing_yards", "passing_tds", "interceptions",
-        "completions", "attempts"
+        "team", "opponent",
+        "passing_yards", "passing_tds", "attempts"
     ]
 
     logger.info(f"QB-game rows: {len(qb)}")
