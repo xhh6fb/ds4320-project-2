@@ -1,65 +1,37 @@
-import json
-import logging
-from pathlib import Path
-import os
-
-from dotenv import load_dotenv
 from pymongo import MongoClient
-
+import json
 from utils_project2 import setup_logger
 
+# -----------------------------------------
+# SETUP LOGGER
+# -----------------------------------------
+logger = setup_logger("mongo_load.log")
 
-def main():
-    """
-    load the custom qb game documents into mongodb atlas.
-    """
-    setup_logger("logs/load_project2_to_mongo.log")
-    logging.info("starting load_project2_to_mongo.py")
+try:
+    logger.info("Connecting to MongoDB")
 
-    try:
-        load_dotenv()
+    client = MongoClient("YOUR_CONNECTION_STRING")
 
-        mongo_uri = os.getenv("MONGODB_URI")
-        db_name = os.getenv("MONGODB_DB", "ds4320_project2")
-        collection_name = os.getenv("MONGODB_COLLECTION", "qb_game_docs")
+    db = client["project2_db"]
+    collection = db["qb_games"]
 
-        if not mongo_uri:
-            raise ValueError("MONGODB_URI is missing from .env")
+    # -----------------------------------------
+    # LOAD JSON FILE
+    # -----------------------------------------
+    with open("data/qb_documents.json") as f:
+        docs = json.load(f)
 
-        json_path = Path("data/processed/qb_game_documents.json")
-        if not json_path.exists():
-            raise FileNotFoundError(f"could not find {json_path}")
+    logger.info(f"Loaded {len(docs)} documents")
 
-        with open(json_path, "r", encoding="utf-8") as f:
-            docs = json.load(f)
+    # -----------------------------------------
+    # INSERT INTO DATABASE
+    # -----------------------------------------
+    collection.delete_many({})
+    collection.insert_many(docs)
 
-        logging.info("loaded %s docs from json", len(docs))
+    logger.info("Data successfully inserted into MongoDB")
 
-        client = MongoClient(mongo_uri)
-        db = client[db_name]
-        collection = db[collection_name]
-
-        # optional: clear existing collection so reruns stay clean
-        collection.delete_many({})
-        logging.info("cleared existing collection")
-
-        if docs:
-            collection.insert_many(docs)
-            logging.info("inserted %s documents", len(docs))
-
-        # create a few indexes to make the collection more usable
-        collection.create_index("season")
-        collection.create_index("week")
-        collection.create_index("player_info.player_id")
-        collection.create_index("player_info.team")
-        collection.create_index("player_info.player_name")
-
-        print(f"done: inserted {len(docs):,} documents into {db_name}.{collection_name}")
-
-    except Exception as e:
-        logging.exception("mongo load failed")
-        raise e
-
-
-if __name__ == "__main__":
-    main()
+except Exception as e:
+    logger.error("MongoDB ERROR")
+    logger.error(str(e))
+    raise
