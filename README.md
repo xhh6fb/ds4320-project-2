@@ -120,6 +120,7 @@ The most consequential decision in this project is the exclusion of historical p
 A second major decision is using play-by-play data rather than pre-aggregated box score data. This allows the defensive features to be computed correctly at the play level — filtering to pass attempts only before aggregating EPA, air yards, and YAC — which is more accurate than applying those metrics to all play types. A third decision is to sort defensive rolling features by `(defteam, season, week)` rather than just `(defteam, week)`, which is necessary to ensure correct temporal ordering across season boundaries. An earlier version of the code sorted only by week and would have incorrectly sequenced observations where week 1 of a new season followed week 18 of the prior season in the wrong order.
  
 <br>
+
 ## Metadata
  
 ### Implicit Schema
