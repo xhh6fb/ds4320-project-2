@@ -2,7 +2,7 @@
 
 ## Hook: A New Approach Asks Whether Game Environment Matters More Than Recent Stats
 
-Every week during the NFL season, analysts, fans, and fantasy sports players ask the same question: how many yards will a quarterback throw for on Sunday? The instinctive answer is to look at what that quarterback did last week (and the week before that). But what if recent stats are the wrong thing to look at? What if the situation a quarterback is walking into matters more than the numbers he walked out with last time?
+Every week during the NFL season, analysts and fans alike ask the same question: how many yards will a quarterback throw for on Sunday? The instinctive answer is to look at what that quarterback did last week (and the week before that). But what if recent stats are the wrong thing to look at? What if the situation a quarterback is walking into matters more than the numbers he walked out with last time?
 
 ## Problem Statement: History-Based Predictions Leave a Blind Spot
 
