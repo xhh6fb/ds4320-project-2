@@ -1,29 +1,13 @@
-# ================================
-# CORE DATA SCIENCE STACK (PYTHON 3.12 SAFE)
-# ================================
-
 numpy>=1.26.0
 pandas>=2.1.0
 
-# ================================
-# NFL DATA PIPELINE
-# ================================
-nfl_data_py>=0.3.0
+nfl_data_py
 
-# ================================
-# DATABASE
-# ================================
 pymongo>=4.6.0
 python-dotenv>=1.0.0
 
-# ================================
-# MACHINE LEARNING
-# ================================
-scikit-learn>=1.4.0
-xgboost>=2.0.0
+scikit-learn
+xgboost
 
-# ================================
-# VISUALIZATION
-# ================================
-matplotlib>=3.8.0
-seaborn>=0.13.0
+matplotlib
+seaborn
