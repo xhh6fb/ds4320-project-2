@@ -47,7 +47,7 @@ def add_rest_days(df, logger):
     return df
 
 # ============================================================
-# WEATHER CLEANING
+# WEATHER
 # ============================================================
 
 def add_weather_features(df, logger):
@@ -86,36 +86,75 @@ def add_qb_form(df, logger):
 
     df["yards_last5"] = (
         df.groupby("player_id")["passing_yards"]
-        .transform(lambda x: x.shift().rolling(5).mean())
+        .transform(lambda x: x.shift().rolling(5, min_periods=1).mean())
+    )
+
+    df["yards_last5_std"] = (
+        df.groupby("player_id")["passing_yards"]
+        .transform(lambda x: x.shift().rolling(5, min_periods=2).std())
     )
 
     return df
 
 # ============================================================
-# DEFENSE LAST 5 GAMES AVERAGE YARDS (DEFENSE "SKILL")
+# DEFENSE FEATURES
 # ============================================================
 
 def add_defense_features(pbp, logger):
-
+    """
+    Computes opponent defensive strength from the QB's perspective.
+    All metrics are lagged (shift(1)) before rolling, so there is
+    no data leakage from the current game.
+ 
+    Metrics computed per game for each defensive team, then rolled:
+        opp_epa_per_pass_allowed   — avg EPA allowed per pass attempt
+        opp_success_rate_allowed   — share of pass plays with EPA > 0
+        opp_air_yards_allowed      — avg air yards allowed per attempt
+        opp_yac_allowed            — avg yards after catch allowed per attempt
+ 
+    FIX vs prior version:
+        - Filters to pass plays only before aggregating
+        - Sorts by (season, week) — not just week — so cross-season
+          ordering is correct
+        - Drops intermediate columns before returning
+    """
+ 
     logger.info("Adding defensive strength features")
-
-    # aggregate defense per game
-    defense = pbp.groupby(
+ 
+    # filter to pass plays only
+    passes = pbp[pbp["pass_attempt"] == 1].copy()
+ 
+    # one row per (season, week, defteam) game 
+    defense = passes.groupby(
         ["season", "week", "defteam"]
     ).agg(
-        def_pass_yards=("passing_yards", "mean")
+        _epa = ("epa", "mean"),
+        _success_rate = ("success", "mean"),
+        _air_yards = ("air_yards", "mean"),
+        _yac = ("yards_after_catch", "mean"),
     ).reset_index()
-
-    # ensure correct ordering
+ 
+    # sort correctly across seasons
     defense = defense.sort_values(["defteam", "season", "week"])
-
-    # rolling defensive strength (past only)
-    defense["def_yards_pg"] = (
-        defense.groupby("defteam")["def_pass_yards"]
-        .transform(lambda x: x.shift().rolling(5).mean())
-    )
-
-    # rename for merge
+ 
+    # rolling 5-game lagged average (no leakage)
+    rolling_map = {
+        "_epa": "opp_epa_per_pass_allowed",
+        "_success_rate": "opp_success_rate_allowed",
+        "_air_yards": "opp_air_yards_allowed",
+        "_yac": "opp_yac_allowed",
+    }
+ 
+    for raw_col, feature_col in rolling_map.items():
+        defense[feature_col] = (
+            defense.groupby("defteam")[raw_col]
+            .transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+        )
+ 
+    # drop raw intermediate columns
+    defense.drop(columns=list(rolling_map.keys()), inplace=True)
+ 
+    # rename for merge key
     defense.rename(columns={"defteam": "opponent"}, inplace=True)
-
+ 
     return defense
